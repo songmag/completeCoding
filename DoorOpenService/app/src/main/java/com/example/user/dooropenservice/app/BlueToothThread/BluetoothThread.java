@@ -18,6 +18,7 @@ import java.util.UUID;
 /*
     BlueTooth를 전체적으로 관리하는 서비스 클래스
     ShakeService가 종료되며 시작된다
+    //
 
  */
 public class BluetoothThread extends Thread {
