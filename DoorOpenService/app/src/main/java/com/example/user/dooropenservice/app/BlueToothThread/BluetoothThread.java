@@ -77,8 +77,6 @@ public class BluetoothThread extends Thread {
     }
 
 
-
-
     /*
      * Bluetooth Adapter에대한 셋팅을 하는 메소드
      * 어댑터를 설정하고, 기기가 블루투스 사용가능상태인지 아닌지 검사한다.
@@ -165,13 +163,9 @@ public class BluetoothThread extends Thread {
     /*
     데이터 전송 함수
      */
-    void sendData(String msg) {
-        try {
-            outputStream.write(msg.getBytes());    // 문자열 전송
-        } catch (Exception e) {
-            // 문자열 전송 도중 오류가 발생한 경우.
+    void sendData(String msg) throws Exception {
 
-        }
+        outputStream.write(msg.getBytes());    // 문자열 전송
 
 
     }
@@ -204,15 +198,17 @@ public class BluetoothThread extends Thread {
         mWorkerThread.start();
 
     }
+
     /*
      * 내부 데이터 수신 쓰레드
      */
-    private class DataReceiveThread extends Thread{
+    private class DataReceiveThread extends Thread {
         Thread thread;//BlueTooth Thread의 정보를 가져올 객체
 
-        public DataReceiveThread(BluetoothThread thread){
+        public DataReceiveThread(BluetoothThread thread) {
             this.thread = thread;
         }
+
         @Override
         public void interrupt() {
             try {
