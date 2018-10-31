@@ -19,17 +19,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //블루투스 이용 가능상태 확인
         CheckingBluetoothState();
-
         //DoorOpenService 실행
         Intent intent = new Intent(getApplicationContext(), DoorOpenService.class);
-
 //        startForegroundService(intent);
         startService(intent);
-
-
     }
 
     @Override
@@ -49,5 +44,4 @@ public class MainActivity extends AppCompatActivity {
             startActivity(enableIntent);
         }
     }
-
 }
