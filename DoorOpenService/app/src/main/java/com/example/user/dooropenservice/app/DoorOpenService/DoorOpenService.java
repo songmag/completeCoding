@@ -31,8 +31,6 @@ public class DoorOpenService extends Service {
 
     @Override
     public void onCreate() {
-
-
         super.onCreate();
     }
 }
