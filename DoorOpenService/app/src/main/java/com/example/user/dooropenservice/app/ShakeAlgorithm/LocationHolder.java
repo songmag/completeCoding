@@ -29,7 +29,9 @@ public class LocationHolder {
     }
 
     public float calculateSubtraction() {
-        float result = x + y + z - (lastX + lastY + lastZ);
+        //값계산이 장애인처럼되서 좌측으로만 계산
+//        float result = (x + y + z) - (lastX + lastY + lastZ);
+        float result = x-lastX;
         return result;
     }
 }

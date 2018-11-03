@@ -3,7 +3,6 @@ package com.example.user.dooropenservice.app.DoorOpenService;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -24,22 +23,28 @@ public class DoorOpenService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+    }
+
+    @Override
+    public void onCreate() {
+        shakeService = new ShakeService(this);
+        setNotification();//백그라운드 서비스를 유지하기위한 설정
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        shakeService = new ShakeService(getApplicationContext());
-        setNotification();
+        if(!shakeService.isListenerSet()){
+            shakeService.registerListener();
+        }
+
         return Service.START_STICKY;
     }
+
+    //Notification을 추가함으로써 ForeGround에 Service가 실행되고있음을 보임으로써 Service 종료 방지
     public void setNotification(){
-        Notification.Builder builder = new Notification.Builder(this).setSmallIcon(R.mipmap.sejong).setContentText("Background 동작중 ^_^");
+        Notification.Builder builder = new Notification.Builder(this).setSmallIcon(R.mipmap.sejong).setContentText("앙 기모띠");
         startForeground(DOOR_OPEN_SERVICE_ID,builder.build());
     }
-    @Override
-    public void onCreate() {
 
-
-        super.onCreate();
-    }
 }

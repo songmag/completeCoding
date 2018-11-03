@@ -10,7 +10,6 @@ import com.example.user.dooropenservice.app.ShakeAlgorithm.IShakeCallback;
 import com.example.user.dooropenservice.app.ShakeAlgorithm.ShakeService;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,8 @@ import java.util.UUID;
 /*
     BlueTooth를 전체적으로 관리하는 서비스 클래스
     ShakeService가 종료되며 시작된다
+    Pairing : 보안 기능 교환, 서로 연결을 하도록 허용하는 작업
+    Bonding : 블루투스가 연결되어 데이터를 주고받을 수 있는 상태
 
  */
 public class BluetoothThread extends Thread {
@@ -39,30 +40,39 @@ public class BluetoothThread extends Thread {
 
     //통신용 변수
     BluetoothSocket socket = null;
-    InputStream inputStream;
+
     OutputStream outputStream;
 
     //수신 전용 변수
-    byte[] readBuffer;
-    int readBufferPosition;
-    byte responseResult = 100;
-    Thread mWorkerThread = null;
+
+    DataReceiveThread dataReceiveThread = null;
 
 
     //콜백을 위한 객체
     IShakeCallback shakeCallback;
 
 
+    public BluetoothThread(ShakeService shakeService, Context context) {
+        //callback메소드를 쓰기위한 객체 정보 얻어오기
+        shakeCallback = shakeService;
+        this.context = context;
+
+    }
+
     @Override
     public void run() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        BluetoothStart();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); //어댑터 정보 가져오기
+        BluetoothStart(); //Bluetooth실행
     }
 
     @Override
     public void interrupt() {
+        if(!shakeCallback.isListenerSet()) {
+            shakeCallback.registerListener(); //Shake 리스너 재등록
+        }
 
-        if (inputStream != null || outputStream != null) {
+        bluetoothAdapter = null;
+        if (outputStream != null) {
             try {
                 outputStream.close();
                 socket.close();
@@ -70,18 +80,10 @@ public class BluetoothThread extends Thread {
                 e.printStackTrace();
             }
 
-            if (mWorkerThread != null) {
-                mWorkerThread = null;
+            if (dataReceiveThread != null) {
+                dataReceiveThread = null;
             }
         }
-    }
-
-    public BluetoothThread(ShakeService shakeService,Context context) {
-        //callback메소드를 쓰기위한 객체 정보 얻어오기
-        shakeCallback = shakeService;
-        this.context = context;
-
-
     }
 
 
@@ -92,21 +94,23 @@ public class BluetoothThread extends Thread {
      */
     private void BluetoothStart() {
 
+
         //블루투스를 지원하며 활성상태일 경우 페어링된 기기 목록을 가져와 아두이노를 연결
         device = bluetoothAdapter.getBondedDevices();
 
-        if (device.size() > 0) { //페어링 된 장치가 있는 경우
-            selectDevice();
 
-            connectToSelectedDevices(arduino);
+        if (device.size() > 0) { //Bond 된 장치가 있는 경우
+            selectDevice(); //기기 선택
+            connectToSelectedDevices(arduino); //선택된 기기로 연결 시도
 
-        } else { //페어링 된 장치가 없는 경우
-            Toast.makeText(context,"페어링 된 장치가 없습니다.",Toast.LENGTH_SHORT).show();
-            shakeCallback.registerListener();
+        } else { //Bond 된 장치가 없는 경우
+            Toast.makeText(context, "장치가 없습니다.", Toast.LENGTH_SHORT).show();
             this.interrupt();
         }
 
     }
+
+
 
 
     /*
@@ -126,14 +130,13 @@ public class BluetoothThread extends Thread {
         # 다이얼로그를 띄워서 선택된 디바이스정보를 저장하는 로직 작성필요
         arduino에 저장
          */
-        if (list.size() > 0)
+        if (list.size() > 0) {
             for (String selectedDevice : list) {
                 if (selectedDevice.contains("HC-06")) { //"HC-06"을 포함하고 있으면 변수에 저장
                     arduino = selectedDevice.toString();
-
                 }
             }
-
+        }
 
     }
 
@@ -153,7 +156,7 @@ public class BluetoothThread extends Thread {
 
             // 데이터 송수신을 위한 스트림 열기
             outputStream = socket.getOutputStream();
-            inputStream = socket.getInputStream();
+
 
             // 데이터 송신
             sendData("1");
@@ -163,6 +166,7 @@ public class BluetoothThread extends Thread {
 
 
         } catch (Exception e) {
+            this.interrupt();
             // 블루투스 연결 중 오류 발생
 
         }
@@ -196,77 +200,14 @@ public class BluetoothThread extends Thread {
     }
 
     // 데이터 수신(쓰레드 사용 수신된 메시지를 계속 검사함)
-    void beginListenForData() {
-
-
-        readBufferPosition = 0;                 // 버퍼 내 수신 문자 저장 위치.
-        readBuffer = new byte[1024];            // 수신 버퍼.
+    void beginListenForData() throws IOException {
 
         // 문자열 수신 쓰레드.
-        mWorkerThread = new DataReceiveThread(this);
-        mWorkerThread.start();
+        dataReceiveThread = new DataReceiveThread(this, socket);
+        dataReceiveThread.setName("ReceiveThread");
+        dataReceiveThread.start();
 
     }
 
-    /*
-     * 내부 데이터 수신 쓰레드
-     */
-    private class DataReceiveThread extends Thread {
-        Thread thread;//BlueTooth Thread의 정보를 가져올 객체
-
-        public DataReceiveThread(BluetoothThread thread) {
-            this.thread = thread;
-        }
-
-        @Override
-        public void interrupt() {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            // interrupt() 메소드를 이용 스레드를 종료시키는 예제이다.
-            // interrupt() 메소드는 하던 일을 멈추는 메소드이다.
-            // isInterrupted() 메소드를 사용하여 멈추었을 경우 반복문을 나가서 스레드가 종료하게 된다.
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    // InputStream.available() : 다른 스레드에서 blocking 하기 전까지 읽은 수 있는 문자열 개수를 반환함.
-                    int byteAvailable = inputStream.available();   // 수신 데이터 확인
-                    if (byteAvailable > 0) {                        // 데이터가 수신된 경우.
-                        byte[] packetBytes = new byte[byteAvailable];
-                        // read(buf[]) : 입력스트림에서 buf[] 크기만큼 읽어서 저장 없을 경우에 -1 리턴.
-                        inputStream.read(packetBytes);
-                        for (int i = 0; i < byteAvailable; i++) {
-                            byte b = packetBytes[i];
-                            if (b == responseResult) {//결과값이 같으면
-//                                    byte[] encodedBytes = new byte[readBufferPosition];
-                                sendData("0");//불끄기 신호 전달
-                                readBufferPosition = 0;
-
-                                //ShakeService 리스너 재등록 (CallBack 이용)
-                                shakeCallback.registerListener();
-
-
-                                //현재 쓰레드에 인터럽트를 걸어줌
-                                Thread.currentThread().interrupt();
-                                thread.interrupt();
-
-                            } else {
-                                readBuffer[readBufferPosition++] = b;
-                            }
-                        }
-                    }
-
-                } catch (Exception e) {    // 데이터 수신 중 오류 발생.
-                    shakeCallback.registerListener();
-                }
-            }
-        }
-
-    }
 
 }

@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="187dp"
-        android:text="좌우로 세게 흔들면 Bluetooth 연결이 시작됩니다." />
+        android:text="좌우로 흔들면 Bluetooth 연결이 시작됩니다." />
 
     <TextView
         android:id="@+id/information2"
@@ -21,5 +21,5 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="240dp"
-        android:text="어플을 종료하여도 계속 탐색합니다." />
+        android:text="어플을 종료해도 동작합니다." />
 </RelativeLayout>
