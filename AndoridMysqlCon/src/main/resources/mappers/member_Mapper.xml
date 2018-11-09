@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.android.memberMapper"> <!-- 클래스의 패키지와유사  -->
+
+	<resultMap id="result" type="com.android.VO.MemberVO"> <!-- VO와의 연결을 위함 -->
+		<result property="userid" column="userid" />
+		<result property="usernum" column="usernum" />
+		<result property="password" column="password" />
+		<result property="name" column="name" />
+		<result property="university" column="university" />	
+	</resultMap>
+
+	<select id="getTime" resultType="string">  <!--현재 시간 출력  --> 
+		select now()
+	</select>
+	
+	<insert id="insertMember" parameterType="com.android.VO.MemberVO"> <!-- 테이블에 레코드 추가 -->
+		insert into member
+		(userid,usernum,password,name,university) values
+		(#{userid},#{usernum},#{password},#{name},#{university})	
+	</insert>
+
+
+	<select id="readWithPw" resultMap="result"> <!--학번이랑 비밀번호로 테이블 조회 -->
+		select * from member where
+		usernum = #{usernum} and password = #{password}
+	</select>
+	
+
+
+</mapper>
