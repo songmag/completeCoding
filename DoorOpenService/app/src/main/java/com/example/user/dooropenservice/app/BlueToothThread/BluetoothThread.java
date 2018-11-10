@@ -119,7 +119,6 @@ public class BluetoothThread extends Thread {
      */
     private void selectDevice() {
 
-
         //페어링 된 블루투스 장치의 이름을 저장
         List<String> list = new ArrayList<String>();
         for (BluetoothDevice searchDevice : device) {
@@ -146,6 +145,7 @@ public class BluetoothThread extends Thread {
      */
     void connectToSelectedDevices(String selectedDeviceName) {
         RemoteDevice = getDeviceFromBondedList(selectedDeviceName);
+
 
         try {
             // 소켓 생성

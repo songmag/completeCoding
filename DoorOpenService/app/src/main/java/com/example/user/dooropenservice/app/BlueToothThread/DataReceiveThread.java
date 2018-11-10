@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 /*
  * 내부 데이터 수신 쓰레드
+ * 송신과 별개로 수신쓰레드는 따로 동작한다.
  */
 public class DataReceiveThread extends Thread {
     //수신용 객체
@@ -18,6 +19,7 @@ public class DataReceiveThread extends Thread {
     final byte responseResult = 100;
 
     Thread thread;//BlueTooth Thread의 정보를 가져올 객체
+
     public DataReceiveThread(BluetoothThread thread, BluetoothSocket socket) throws IOException {
         this.socket = socket;
         this.thread = thread;
@@ -33,7 +35,7 @@ public class DataReceiveThread extends Thread {
     @Override
     public void interrupt() {
         try {
-            if(inputStream!=null) {
+            if (inputStream != null) {
                 inputStream.close();
             }
             thread.interrupt();
@@ -44,8 +46,10 @@ public class DataReceiveThread extends Thread {
 
     @Override
     public void run() {
+
         try {
-            while (true) {
+            State state = Thread.currentThread().getState();
+            while (!Thread.currentThread().isInterrupted()) {
                 // InputStream.available() : 다른 스레드에서 blocking 하기 전까지 읽은 수 있는 문자열 개수를 반환함.
                 int byteAvailable = inputStream.available();   // 수신 데이터 확인
                 if (byteAvailable > 0) {                        // 데이터가 수신된 경우.
@@ -61,6 +65,7 @@ public class DataReceiveThread extends Thread {
                             //소켓을 닫아버림으로써 IOException 발생하며 while문 탈출
                             this.interrupt();
 
+
                         } else {
                             readBuffer[readBufferPosition++] = b;
                         }
@@ -69,7 +74,6 @@ public class DataReceiveThread extends Thread {
             }//end of while
         } catch (IOException e) {    // 데이터 수신 중 오류 발생.
             e.printStackTrace();
-
         }
     }
 }

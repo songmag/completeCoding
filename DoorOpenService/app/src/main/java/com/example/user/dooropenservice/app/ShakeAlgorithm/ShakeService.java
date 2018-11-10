@@ -28,7 +28,7 @@ public class ShakeService implements SensorEventListener, IShakeCallback {
 
     //앱 정보
     Context context;
-    Context applicationContext;
+
     //Bluetooth 관련
     BluetoothThread bluetoothThread = null;
 

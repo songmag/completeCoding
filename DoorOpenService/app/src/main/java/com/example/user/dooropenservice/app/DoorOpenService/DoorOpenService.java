@@ -28,14 +28,15 @@ public class DoorOpenService extends Service {
 
     @Override
     public void onCreate() {
-        shakeService = new ShakeService(this);
-        setNotification();//백그라운드 서비스를 유지하기위한 설정
+
+        shakeService = new ShakeService(this);//이거를 범위 내에 들어왔을떄 만듬
+        setNotification();//백그라운드 서비스를 유지하기위한 설정 (이거는 유지 onCreate에 있어야 함)
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(!shakeService.isListenerSet()){
-            shakeService.registerListener();
+            shakeService.registerListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
         }
 
         return Service.START_STICKY;
