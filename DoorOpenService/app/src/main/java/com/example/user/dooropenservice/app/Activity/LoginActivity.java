@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.ServerConnection.ILoginCallback;
 import com.example.user.dooropenservice.app.ServerConnection.ServerConnection;
+import com.example.user.dooropenservice.app.ServerConnection.UserVO;
 
 /*
 로그인동작과 서버통신이 이루어지는 Activity Class
@@ -24,6 +25,7 @@ public class LoginActivity extends Activity {
     private Button Login;
     private ServerConnection serverConnection;//서버와 연결하기위한 객체
     private ILoginCallback callback;//로그인 상황에 따른 콜백을 정의해주는 인터페이스 객체
+    private UserVO user;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,16 +56,15 @@ public class LoginActivity extends Activity {
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String UserID = ID.getText().toString();
-                String UserPassword = PassWord.getText().toString();
-                if(UserID.equals("")){
+                user = new UserVO(ID.getText().toString(),PassWord.getText().toString()); //사용자 정보 저장
+                if(user.getId().equals("")){
                     Toast.makeText(getApplicationContext(),"아이디를 입력하시오",Toast.LENGTH_SHORT).show();
                 }
-                else if(UserPassword.equals("")){
+                else if(user.getPassword().equals("")){
                     Toast.makeText(getApplicationContext(),"비밀번호를 입력하시오",Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    serverConnection = new ServerConnection(UserID, UserPassword, callback);
+                    serverConnection = new ServerConnection(user, callback);
                     serverConnection.setName("ServerConnectionThread");
                     serverConnection.start();
                 }

@@ -1,5 +1,8 @@
 package com.example.user.dooropenservice.app.ServerConnection;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -12,7 +15,7 @@ import java.net.Socket;
 public class ServerConnection extends Thread {
 
     //서버통신관련 변수
-    private final String SERVER_IP = "210.107.234.119";//서버의 아이피 주소
+    private final String SERVER_IP = "192.168.42.147";//서버의 아이피 주소
     private int port = 5050;//사용할 포트넘버
     //서버통신관련 객체
     private String Result = ""; //서버에서 날라온 결과를 저장하는 String
@@ -21,16 +24,25 @@ public class ServerConnection extends Thread {
     private BufferedWriter writer;//데이터 전송객체
 
     //사용자 정보 객체
-    private String id; //사용자의 ID 정보를 저장할 공간
-    private String password; //사용자의 Password 를 저장할 공간
+    private UserVO user;
+    private JSONObject Juser;
 
     private ILoginCallback callback; //로그인 성공유무를 Login Activity 로 알릴 callback 객체
 
 
-    public ServerConnection(String id, String password, ILoginCallback callback) {
-        this.id = id;
+    public ServerConnection(UserVO user, ILoginCallback callback) {
+        this.user= user;
         this.callback = callback;
-        this.password = password;
+
+        Juser = new JSONObject();
+        //JSON 데이터 삽입
+        try {
+            Juser.put("id",user.getId());
+            Juser.put("password",user.getPassword());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -65,6 +77,7 @@ public class ServerConnection extends Thread {
                             callback.StartService();
                         else if (Result.equals("false"))//인증실패(ID나 PASSWORD 중 하나가 잘못됨)
                             callback.FailToLogin();
+
                     } else {//DB에 없는 데이터일 경우
                         callback.FailToLogin();
                     }
@@ -77,7 +90,7 @@ public class ServerConnection extends Thread {
 
     private void sendData() {
         PrintWriter out = new PrintWriter(writer, true);
-        out.println(id + "/" + password + "/");
+        out.println(Juser);
     }
 
     private void settingSocket() {
