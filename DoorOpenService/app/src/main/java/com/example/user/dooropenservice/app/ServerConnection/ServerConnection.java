@@ -15,7 +15,7 @@ import java.net.Socket;
 public class ServerConnection extends Thread {
 
     //서버통신관련 변수
-    private final String SERVER_IP = "192.168.42.147";//서버의 아이피 주소
+    private final String SERVER_IP = "192.168.42.238";//서버의 아이피 주소
     private int port = 5050;//사용할 포트넘버
     //서버통신관련 객체
     private String Result = ""; //서버에서 날라온 결과를 저장하는 String
@@ -37,8 +37,8 @@ public class ServerConnection extends Thread {
         Juser = new JSONObject();
         //JSON 데이터 삽입
         try {
-            Juser.put("id",user.getId());
-            Juser.put("password",user.getPassword());
+            Juser.put("id",Integer.parseInt(user.getId()));
+            Juser.put("password",Integer.parseInt(user.getPassword()));
         } catch (JSONException e) {
             e.printStackTrace();
         }
