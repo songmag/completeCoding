@@ -12,7 +12,7 @@ import java.net.Socket;
 public class ServerConnection extends Thread {
 
     //서버통신관련 변수
-    private final String SERVER_IP = "172.30.1.58";//서버의 아이피 주소
+    private final String SERVER_IP = "210.107.234.119";//서버의 아이피 주소
     private int port = 5050;//사용할 포트넘버
     //서버통신관련 객체
     private String Result = ""; //서버에서 날라온 결과를 저장하는 String
@@ -41,36 +41,37 @@ public class ServerConnection extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        sendData();//데이터 보내기
-
-        //데이터 받는 내부 스레드
-        Thread ReceiveData = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String line;
-                    while (true) {
-                        line = reader.readLine();
-                        Result = line;
-                        if ((Result.equals("true")) || (Result.equals("false")))
-                            break; //true 나 false 가 돌아왔을 때는 서버와 통신이 되었다는 결과 (왜? 서버에서 그러도록 내가 짰으니까 ㅋ
+        if(writer!=null) {
+            sendData();//데이터 보내기
+        }
+        if(reader!=null){
+            //데이터 받는 내부 스레드
+            Thread ReceiveData = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        String line;
+                        while (true) {
+                            line = reader.readLine();
+                            Result = line;
+                            if ((Result.equals("true")) || (Result.equals("false")))
+                                break; //true 나 false 가 돌아왔을 때는 서버와 통신이 되었다는 결과 (왜? 서버에서 그러도록 내가 짰으니까 ㅋ
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (Result != null) { //결과값이 돌아왓을 때
-                    if (Result.equals("true"))//인증성공
-                        callback.StartService();
-                    else if (Result.equals("false"))//인증실패(ID나 PASSWORD 중 하나가 잘못됨)
+                    if (Result != null) { //결과값이 돌아왓을 때
+                        if (Result.equals("true"))//인증성공
+                            callback.StartService();
+                        else if (Result.equals("false"))//인증실패(ID나 PASSWORD 중 하나가 잘못됨)
+                            callback.FailToLogin();
+                    } else {//DB에 없는 데이터일 경우
                         callback.FailToLogin();
-                } else {//DB에 없는 데이터일 경우
-                    callback.FailToLogin();
+                    }
                 }
-            }
-        };
-        ReceiveData.start(); //데이터 받아오기
-
+            };
+            ReceiveData.start(); //데이터 받아오기
+        }
     }
 
 
