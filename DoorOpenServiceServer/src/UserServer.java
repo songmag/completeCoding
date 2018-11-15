@@ -49,7 +49,7 @@ public class UserServer {
 					System.out.println("읽어들인 값 : " + data.get("id") + data.get("password"));
 
 					db.connectDB();// db와 연결
-					boolean flag = db.IsClient(data);// 있는 고객인지 아닌지 확인
+					int flag = db.IsClient(data);// 있는 고객인지 아닌지 확인
 
 					writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),
 							true);
