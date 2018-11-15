@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         //블루투스 사용상태가 아닐경우 블루투스 사용상태 Dialog 출력
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
             startActivity(enableIntent);
         }
     }
