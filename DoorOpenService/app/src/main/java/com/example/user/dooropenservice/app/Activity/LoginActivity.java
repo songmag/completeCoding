@@ -30,6 +30,7 @@ public class LoginActivity extends Activity {
     private ServerConnection serverConnection;//서버와 연결하기위한 객체
     private ILoginCallback callback;//로그인 상황에 따른 콜백을 정의해주는 인터페이스 객체
     private UserVO user;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +38,7 @@ public class LoginActivity extends Activity {
 
         //위치정보 허가받기 (RunTime Permission Check)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
         //로그인을 위한 콜백함수 구현
         callback = new ILoginCallback() {
@@ -47,13 +48,26 @@ public class LoginActivity extends Activity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
             }
+
             @Override
-            public void FailToLogin(){
-                Log.e("FailToLogin","로그인에 실패하였습니다.");
-                /*
-                 * 회원가입 프로토콜 작성
-                 * 토스트 띄울 수 없음...
-                 */
+            public void FailToLogin() {
+                Log.e("FailToLogin", "로그인에 실패하였습니다.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void NoData() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "사용자 정보가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         };
 
@@ -64,14 +78,15 @@ public class LoginActivity extends Activity {
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user = new UserVO(ID.getText().toString(),PassWord.getText().toString()); //사용자 정보 저장
-                if(user.getId().equals("")){
-                    Toast.makeText(getApplicationContext(),"아이디를 입력하시오",Toast.LENGTH_SHORT).show();
+
+                user = new UserVO(ID.getText().toString(), PassWord.getText().toString()); //사용자 정보 저장
+                if (user.getId().equals("")) {
+                    Toast.makeText(getApplicationContext(), "아이디를 입력하시오", Toast.LENGTH_SHORT).show();
                 }
-                else if(user.getPassword().equals("")){
-                    Toast.makeText(getApplicationContext(),"비밀번호를 입력하시오",Toast.LENGTH_SHORT).show();
+                if (user.getPassword().equals("")) {
+                    Toast.makeText(getApplicationContext(), "비밀번호를 입력하시오", Toast.LENGTH_SHORT).show();
                 }
-                else {
+                if (!user.getId().equals("") && !user.getPassword().equals("")) {//둘다 데이터가 있는 경우 시작
                     serverConnection = new ServerConnection(user, callback);
                     serverConnection.setName("ServerConnectionThread");
                     serverConnection.start();
@@ -79,7 +94,6 @@ public class LoginActivity extends Activity {
                 /*
                 로그인 인증 프로토콜 코드 작성
                  */
-
 
 
             }
