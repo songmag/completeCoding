@@ -27,7 +27,7 @@ public class DoorOpenService extends Service {
 
     private static final String TAG = "TEST_GPS";
     private LocationManager locationManager = null;
-    private static final long LOCATION_INTERVAL = 1000*1;
+    private static final long LOCATION_INTERVAL = 1000*10;
     private static final long LOCATION_DISTANCE = 10;
 
     @Nullable

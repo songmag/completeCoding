@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 public class ServerConnection extends Thread {
 
     //서버통신관련 변수
-    private final String SERVER_IP = "117.111.17.232";//서버의 아이피 주소
+    private final String SERVER_IP = "221.146.111.40";//서버의 아이피 주소(재섭이형네 아이피주소)
+//    private final String SERVER_IP = "210.205.46.5";//우리집(재영이집 아이피주소)
     private int port = 5050;//사용할 포트넘버
     //서버통신관련 객체
     private String Result = ""; //서버에서 날라온 결과를 저장하는 String
