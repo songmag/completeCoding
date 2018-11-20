@@ -1,4 +1,4 @@
-package com.example.user.dooropenservice.app.BluetoothThread;
+package com.example.user.dooropenservice.app.BlueToothThread;
 
 import android.bluetooth.BluetoothSocket;
 

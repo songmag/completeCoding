@@ -6,8 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Vibrator;
-
-import com.example.user.dooropenservice.app.BluetoothThread.BluetoothThread;
+import com.example.user.dooropenservice.app.BlueToothThread.BluetoothThread;
 
 
 /*

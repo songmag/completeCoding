@@ -3,11 +3,10 @@ package com.example.user.dooropenservice.app.Activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +15,7 @@ import android.widget.Toast;
 
 import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.ServerConnection.ILoginCallback;
-import com.example.user.dooropenservice.app.ServerConnection.ServerConnection;
+import com.example.user.dooropenservice.app.ServerConnection.ServerLogin;
 import com.example.user.dooropenservice.app.ServerConnection.UserVO;
 
 /*
@@ -25,17 +24,26 @@ import com.example.user.dooropenservice.app.ServerConnection.UserVO;
 @Author : 조재영
  */
 public class LoginActivity extends Activity {
+
+
     private EditText ID, PassWord;
     private Button Login;
-    private ServerConnection serverConnection;//서버와 연결하기위한 객체
+    private ServerLogin serverLogin;//서버와 연결하기위한 객체
     private ILoginCallback callback;//로그인 상황에 따른 콜백을 정의해주는 인터페이스 객체
     private UserVO user;
 
+    private String id;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
+        id = preferences.getString("id","");
+        if(!id.equals("")){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        }
         //위치정보 허가받기 (RunTime Permission Check)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -46,6 +54,11 @@ public class LoginActivity extends Activity {
             public void StartService() {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("id",ID.getText().toString());
+                editor.commit();
+
                 startActivity(intent);
             }
 
@@ -87,9 +100,9 @@ public class LoginActivity extends Activity {
                     Toast.makeText(getApplicationContext(), "비밀번호를 입력하시오", Toast.LENGTH_SHORT).show();
                 }
                 if (!user.getId().equals("") && !user.getPassword().equals("")) {//둘다 데이터가 있는 경우 시작
-                    serverConnection = new ServerConnection(user, callback);
-                    serverConnection.setName("ServerConnectionThread");
-                    serverConnection.start();
+                    serverLogin = new ServerLogin(user,callback);
+                    serverLogin.setName("ServerConnectionThread");
+                    serverLogin.start();
                 }
                 /*
                 로그인 인증 프로토콜 코드 작성

@@ -22,4 +22,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="240dp"
         android:text="어플을 종료해도 동작합니다." />
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="116dp"
+        android:text="Button" />
 </RelativeLayout>
