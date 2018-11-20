@@ -9,7 +9,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
+/*
+ * ServerLogin
+ * 서버에 로그인을 요청하는 스레드
+ * function : 서버와의 통신 (송, 수신)
+ * 입력받은 정보로 서버에 로그인작업을 요청
+ * 로그인결과에 해당하는 동작 실행 (ILoginCallback)
+ * 상호작용 : LoginActivity , ILoginCallback
+ */
 public class ServerLogin extends ServerConnection {
 
 
@@ -19,9 +26,9 @@ public class ServerLogin extends ServerConnection {
 
     protected String Result = ""; //서버에서 날라온 결과를 저장하는 String
 
-    private static final int LOGIN_OK = 1;
-    private static final int NO_DATA = 2;
-    private static final int LOGIN_FAIL = 3;
+    private static final int LOGIN_OK = 1; //로그인 성공
+    private static final int NO_DATA = 2; //데이터베이스에 저장된 정보 없음
+    private static final int LOGIN_FAIL = 3; //로그인 실패
 
     protected BufferedReader reader;//데이터 수신객체
     protected BufferedWriter writer;//데이터 전송객체

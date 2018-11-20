@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /*
- * 내부 데이터 수신 쓰레드
- * 송신과 별개로 수신쓰레드는 따로 동작한다.
+ * DataReceiveThread
+ * BlueTooth에서 데이터를 수신하기위한 스레드
+ * function :  아두이노에서 데이터를 받아온다
+ * 상호작용 : BluetoothThread
+ * @Author : 조재영
  */
 public class DataReceiveThread extends Thread {
     //수신용 객체

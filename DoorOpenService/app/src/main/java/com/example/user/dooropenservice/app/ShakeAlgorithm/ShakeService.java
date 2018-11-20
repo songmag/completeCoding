@@ -6,12 +6,17 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Vibrator;
+
 import com.example.user.dooropenservice.app.BlueToothThread.BluetoothThread;
 
 
 /*
-Shake_Algorithm 을 관리하는 Class
-@Author : 조재영
+ * ShakeService
+ * Shake_Algorithm 을 관리하는 Class
+ * function : 핸드폰에 Shake상태를 체크하여 블루투스 통신을 시도하는 클래스
+ * 블루투스 데이터 통신시 진동이 울리도록 함
+ * 상호작용 : DoorOpenServcie(GPS), BluetoothThread
+ * @Author : 조재영
  */
 public class ShakeService implements SensorEventListener, IShakeCallback {
 

@@ -18,8 +18,12 @@ import java.util.Set;
 import java.util.UUID;
 
 /*
-    BlueTooth를 전체적으로 관리하는 서비스 클래스
-    ShakeService가 종료되며 시작된다
+ * BluetoothThread
+ * BlueTooth를 전체적으로 관리하는 서비스 클래스
+ * Bluetooth연결의 기본동작과 기기선택을 관리함
+ * function : 페어링된 블루투스 선택, 블루투스로 데이터를 송신
+ * 상호작용 : DataReceiveThread, ShakeService
+ * @Author : 조재영
     Pairing : 보안 기능 교환, 서로 연결을 하도록 허용하는 작업
     Bonding : 블루투스가 연결되어 데이터를 주고받을 수 있는 상태
 

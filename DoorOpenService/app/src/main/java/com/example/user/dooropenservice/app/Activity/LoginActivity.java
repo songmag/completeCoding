@@ -19,9 +19,12 @@ import com.example.user.dooropenservice.app.ServerConnection.ServerLogin;
 import com.example.user.dooropenservice.app.ServerConnection.UserVO;
 
 /*
-로그인동작과 서버통신이 이루어지는 Activity Class
-여기서는 Service 가 동작하지 않는다.
-@Author : 조재영
+ * LoginActivity
+ * 로그인동작과 서버통신이 이루어지는 Activity Class
+ * 여기서는 Service 가 동작하지 않는다.
+ * function : 로그인정보를 생성하고 서버와 통신한다.
+ * 로그인에대한 콜백함수가 구현되어있다. <-> ServerLogin
+ * @Author : 조재영
  */
 public class LoginActivity extends Activity {
 
@@ -37,6 +40,8 @@ public class LoginActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //앱을 메모리에서 제거 하였다 다시 실행할시 SharedPreference 를 확인하여 skip 한다.
         SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
         id = preferences.getString("id","");
         if(!id.equals("")){
@@ -44,6 +49,7 @@ public class LoginActivity extends Activity {
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         }
+
         //위치정보 허가받기 (RunTime Permission Check)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -54,6 +60,8 @@ public class LoginActivity extends Activity {
             public void StartService() {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                //로그인이 되어 실행이 되면 현재 로그인정보를 저장한다.
                 SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("id",ID.getText().toString());
@@ -92,6 +100,7 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
 
+                //로그인 동작에 대한 로직
                 user = new UserVO(ID.getText().toString(), PassWord.getText().toString()); //사용자 정보 저장
                 if (user.getId().equals("")) {
                     Toast.makeText(getApplicationContext(), "아이디를 입력하시오", Toast.LENGTH_SHORT).show();

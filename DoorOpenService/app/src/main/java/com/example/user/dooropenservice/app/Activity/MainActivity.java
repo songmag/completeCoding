@@ -1,14 +1,8 @@
 package com.example.user.dooropenservice.app.Activity;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,8 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /*
-어플에대한 설명과 Service들이 실행되는 메인 엑티비티 클래스
-@Author : 조재영
+ * MainActivity
+ * 어플에대한 설명과 로그아웃기능이 있는 메인 엑티비티 클래스
+ * function : LoginActivity에서 받은 정보를 가져와 로그아웃정보로 사용한다(SharedPreference)
+ * 상호작용 : LoginActivity , ServerLogOut
+ * @Author : 조재영
  */
 public class MainActivity extends AppCompatActivity {
     BluetoothAdapter bluetoothAdapter;
@@ -48,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+        //로그아웃버튼
         logOutBtn = findViewById(R.id.logout);
         logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override

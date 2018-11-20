@@ -6,7 +6,14 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
+/*
+ * ServerLogOut Thread
+ * 서버에 로그아웃을 요청하는 스레드
+ * function : 서버와의 통신(송신만)
+ * 현재 로그인되어있는 정보를 서버에서 변경한다.
+ * 상호작용 : MainActivity
+ * @Author : 조재영
+ */
 public class ServerLogOut extends ServerConnection {
 
     protected BufferedWriter writer;//데이터 전송객체

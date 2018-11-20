@@ -1,18 +1,20 @@
 package com.example.user.dooropenservice.app.ServerConnection;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-
+/*
+ * ServerConnection Thread
+ * 서버와 연결을 위한 스레드 클래스
+ * 자식으로 ServerLogOut, ServerLogin을 가진다.
+ * function : 서버와의 소켓연결
+ * @Author : 조재영
+ */
 abstract class ServerConnection extends Thread {
 
     //서버통신관련 변수
-//    private final String SERVER_IP = "221.146.111.40";//서버의 아이피 주소(재섭이형네 아이피주소)
-    private final String SERVER_IP = "210.205.46.5";//우리집(재영이집 아이피주소)
+    private final String SERVER_IP = "221.146.111.40";//서버의 아이피 주소(제섭이형네 아이피주소)
+//    private final String SERVER_IP = "210.205.46.5";//우리집(재영이집 아이피주소)
 //    private final String SERVER_IP = "169.254.154.205";//변경되는 IP
     private int port = 5050;//사용할 포트넘버
 

@@ -16,7 +16,13 @@ import android.util.Log;
 
 import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.ShakeAlgorithm.ShakeService;
-
+/*
+ * DoorOpenService
+ * 앱이 백그라운드에서 유지되기 위한 주 서비스클래스
+ * function : GPS값을 주기적으로 받아 위치확인 후 ShakeCallback 을 이용해 리스너를 관리
+ * 상호작용 : ShakeService(IShakeCallback)
+ * @Author : 조재영
+ */
 public class DoorOpenService extends Service {
 
     static final int DOOR_OPEN_SERVICE_ID = 1;
