@@ -12,17 +12,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class UserServer {
-	public static final int ServerPort = 8088;//»ç¿ëÇÒ ¼­¹öÆ÷Æ®
+	public static final int ServerPort = 8088;//ì‚¬ìš©í•  ì„œë²„í¬íŠ¸
 	
-	ServerSocket serverSocket = null; //¼­¹ö ¼ÒÄÏ (¿¬°áµÇ´Â Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏÀ» °Ë»çÇÏ±â À§ÇÔ)
-	Socket client;//Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏ (¿¬°áµÈ Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏÀ» °áÁ¤ÇÏ±â À§ÇÔ)
+	ServerSocket serverSocket = null; //ì„œë²„ ì†Œì¼“ (ì—°ê²°ë˜ëŠ” í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ì„ ê²€ì‚¬í•˜ê¸° ìœ„í•¨)
+	Socket client;//í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ (ì—°ê²°ëœ í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ì„ ê²°ì •í•˜ê¸° ìœ„í•¨)
 	
-	InetAddress local;//ÇöÀç »ç¿ëÇÏ°í ÀÖ´Â ServerPCÀÇ IP°ªÀ» °¡Á®¿À±â À§ÇÑ °´Ã¼ (Debug¿ë)
+	InetAddress local;//í˜„ì¬ ì‚¬ìš©í•˜ê³  ìˆëŠ” ServerPCì˜ IPê°’ì„ ê°€ì ¸ì˜¤ê¸° ìœ„í•œ ê°ì²´ (Debugìš©)
 	
-	BufferedReader reader; //Client¿¡¼­ º¸³½ µ¥ÀÌÅÍ¸¦ ÀĞ±â À§ÇÑ °´Ã¼
-	PrintWriter writer; //Client·Î µ¥ÀÌÅÍ¸¦ º¸³»±â À§ÇÑ °´Ã¼
+	BufferedReader reader; //Clientì—ì„œ ë³´ë‚¸ ë°ì´í„°ë¥¼ ì½ê¸° ìœ„í•œ ê°ì²´
+	PrintWriter writer; //Clientë¡œ ë°ì´í„°ë¥¼ ë³´ë‚´ê¸° ìœ„í•œ ê°ì²´
 
-	DataBase db; //DataBase°ü¸® °´Ã¼
+	DataBase db; //DataBaseê´€ë¦¬ ê°ì²´
 	
 	
 	public UserServer() {
@@ -45,17 +45,16 @@ public class UserServer {
 		try {
 			
 			while (true) {
-				// ¼ÒÄÏ Á¢¼Ó ¿äÃ»ÀÌ ¿Ã¶§±îÁö ´ë±â
+				// ì†Œì¼“ ì ‘ì† ìš”ì²­ì´ ì˜¬ë•Œê¹Œì§€ ëŒ€ê¸°
 				client = serverSocket.accept();
-				System.out.println("Client ¿¬°á");
+				System.out.println("Client ì—°ê²°");
 				reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 				JsonParser parser = new JsonParser();
 				JsonObject data = (JsonObject)parser.parse(reader.readLine());
-				System.out.println("ÀĞ¾îµéÀÎ °ª : " + data.get("id") + data.get("password") + data.get("name") + data.get("com") + data.get("flag"));
-				db.connectDB();// db¿Í ¿¬°á
+				System.out.println("ì½ì–´ë“¤ì¸ ê°’ : " + data.get("id") + data.get("password") + data.get("name") + data.get("com") + data.get("flag"));
+				db.connectDB();// dbì™€ ì—°ê²°
 				
-				memberjoin(data);
-				//serverorder(data); //¸í·É µé¾î¿Â°Å¿¡µû¶ó ½ÇÇà
+				serverorder(data); //ëª…ë ¹ ë“¤ì–´ì˜¨ê±°ì—ë”°ë¼ ì‹¤í–‰
 				
 			}
 
@@ -72,12 +71,12 @@ public class UserServer {
 	}
 	
 	
-	void login(JsonObject data) throws IOException //·Î±×ÀÎ
+	void login(JsonObject data) throws IOException //ë¡œê·¸ì¸
 	{
-		int flag = db.IsClient(data);// ÀÖ´Â °í°´ÀÎÁö ¾Æ´ÑÁö È®ÀÎ
+		int flag = db.IsClient(data);// ìˆëŠ” ê³ ê°ì¸ì§€ ì•„ë‹Œì§€ í™•ì¸
 		writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),
 				true);
-		System.out.println("º¸³¾ °ª : " + flag);
+		System.out.println("ë³´ë‚¼ ê°’ : " + flag);
 		writer.println(flag);
 	}
 	
@@ -86,23 +85,23 @@ public class UserServer {
 		db.logoutmember(data);
 	}
 	
-	void memberjoin(JsonObject data) throws IOException  //È¸¿ø°¡ÀÔ 
+	void memberjoin(JsonObject data) throws IOException  //íšŒì›ê°€ì… 
 	{
 		int flag = db.joinmember(data);
 		writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),
 				true);
-		System.out.println("º¸³¾ °ª : " + flag);
+		System.out.println("ë³´ë‚¼ ê°’ : " + flag);
 		writer.println(flag);
 	}
 	
-	void memberdelete(JsonObject data) //È¸¿ø»èÁ¦
+	void memberdelete(JsonObject data) //íšŒì›ì‚­ì œ
 	{
 		db.deletemember(data);
 	}
 	
 	void serverorder(JsonObject data) throws IOException
 	{
-		// ¾ÆÀÌµğ ºñ¹Ğ¹øÈ£ ÇÃ·¡±×0 µé¾î¿À¸é ·Î±×ÀÎ , ¾ÆÀÌµğ  ÇÃ·¡±×1 ·Î±×¾Æ¿ô,  4°¡Áö µé¾î¿À¸é+ÇÃ·¡±×°¡0ÀÌ¸é È¸¿ø°¡ÀÔ,  ¾ÆÀÌµğ ºñ¹Ğ¹øÈ£ ÇÃ·¡±×1ÀÌ¸é È¸¿øÅ»Åğ
+		// ì•„ì´ë”” ë¹„ë°€ë²ˆí˜¸ í”Œë˜ê·¸0 ë“¤ì–´ì˜¤ë©´ ë¡œê·¸ì¸ , ì•„ì´ë””  í”Œë˜ê·¸1 ë¡œê·¸ì•„ì›ƒ,  4ê°€ì§€ ë“¤ì–´ì˜¤ë©´+í”Œë˜ê·¸ê°€0ì´ë©´ íšŒì›ê°€ì…,  ì•„ì´ë”” ë¹„ë°€ë²ˆí˜¸ í”Œë˜ê·¸1ì´ë©´ íšŒì›íƒˆí‡´
 		if (data.get("flag").getAsInt()==0)
 		{
 			if(data.get("id")!=null&&data.get("password")!=null)
