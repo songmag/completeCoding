@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 abstract public class ClientJob{	
 	protected final String address = "jdbc:mariadb://localhost:3306/dooropenservice";
 	protected final String user = "root";
-	protected final String password = "8845";
+	protected final String password = "920821";
 
 	protected Connection conn; 
 	

@@ -13,12 +13,12 @@ import com.google.gson.JsonParser;
 import CapPackage.DataBase;
 
 public class ClientThread extends Thread {
-	BufferedReader reader; // Client���� ���� �����͸� �б� ���� ��ü
-	PrintWriter writer; // Client�� �����͸� ������ ���� ��ü
+	BufferedReader reader; 
+	PrintWriter writer; 
 	
 	Socket client;
 	
-	DataBase db; // DataBase���� ��ü
+	DataBase db; 
 	public ClientThread(Socket client) {
 		db = new DataBase();
 		this.client = client;
@@ -38,7 +38,7 @@ public class ClientThread extends Thread {
 			JsonParser parser = new JsonParser();
 			JsonObject data = (JsonObject) parser.parse(reader.readLine());
 			int size=0;
-			System.out.println("�о���� �� : " + data.get("id") + data.get("password"));
+			System.out.println("ID,PW >> : " + data.get("id") + data.get("password"));
 			if(data.get("password")==null) 
 				size = 1;
 			else if(data.get("name")!= null)
@@ -49,7 +49,7 @@ public class ClientThread extends Thread {
 			flag = db.excute(data, size);
 			writer = new PrintWriter(
 					new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
-			System.out.println("���� �� : " + flag);
+			System.out.println("Flag change : " + flag);
 			writer.println(flag);
 		} catch (Exception e) {
 			e.printStackTrace();

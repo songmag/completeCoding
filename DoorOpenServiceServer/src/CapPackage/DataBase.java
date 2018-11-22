@@ -1,7 +1,6 @@
 package CapPackage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import com.google.gson.JsonObject;
@@ -48,37 +47,47 @@ public class DataBase extends ClientJob implements DBConnectionInterface{
 	protected int signin(JsonObject data) throws SQLException {
 		// TODO Auto-generated method stub
 		int return_value;
-		if(checkNumber(data.get("id").toString()).equals("error"))
+		System.out.println("signin start >> "+data.get("id").toString());
+		
+		if(checkNumber(data.get("id").toString().replace("\"", "")).equals("error")) {
+			System.out.println("error");
 			return LOGIN_FAIL;
+		}
 		PreparedStatement stat;
-		String sql = "insert into member values (?,?,?,?,'0')";
+		String sql = "insert into member (id,password,name,univ) values (?,?,?,?)";
 		stat = conn.prepareStatement(sql);
 		stat.setString(1, data.get("id").toString().replace("\"",""));
 		stat.setString(2, data.get("password").toString().replace("\"",""));
 		stat.setString(3, data.get("name").toString().replace("\"",""));
-		stat.setString(4, data.get("univ").toString().replace("\"",""));
-		if(!stat.execute())
+		stat.setString(4,data.get("univ").toString().replace("\"",""));
+		
+		try{
+			stat.executeUpdate();
+		}catch(SQLException e)
 		{
+			System.out.println("exist name");
 			return_value = LOGIN_FAIL;
 		}
 		stat.close();
 		return_value = LOGIN_OK;
+		System.out.println("signin end");
 		return return_value;
 	}
 	@Override
 	protected int login(JsonObject data) throws SQLException {
 		int return_value;
 		PreparedStatement stat;
-		String sql = "update member set flag = '1' where id =? and password = ? ";
+		String sql = "update member set flag = 1 where id =? and password = ? ";
 		stat = conn.prepareStatement(sql);
 		stat.setString(1, data.get("id").toString().replace("\"",""));
 		stat.setString(2, data.get("password").toString().replace("\"",""));
 
-		if(!stat.execute())
+		if(stat.executeUpdate()==0)
 		{
 			return_value = LOGIN_FAIL;
 		}
-		return_value = LOGIN_OK;
+		else
+			return_value = LOGIN_OK;
 		stat.close();
 		return return_value;
 	}
@@ -87,10 +96,10 @@ public class DataBase extends ClientJob implements DBConnectionInterface{
 	protected int logout(JsonObject data) throws SQLException {
 		int return_value;
 		PreparedStatement stat;
-		String sql = "update member set flag = '0' where id = ?";
+		String sql = "update member set flag = 0 where id = ?";
 		stat = conn.prepareStatement(sql);
 		stat.setString(1, data.get("id").toString().replace("\"",""));
-		if(!stat.execute())
+		if(stat.executeUpdate()==0)
 		{
 			return_value = LOGIN_FAIL;
 		}
