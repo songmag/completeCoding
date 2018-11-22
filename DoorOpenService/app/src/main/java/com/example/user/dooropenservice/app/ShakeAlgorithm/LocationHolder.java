@@ -1,7 +1,9 @@
 package com.example.user.dooropenservice.app.ShakeAlgorithm;
 /*
-Shake_Algorithm 의 좌표정보를 저장/관리 하는 클래스
-@Author : 조재영
+ * LocationHolder
+ * Shake_Algorithm 의 좌표정보를 저장/관리 하는 클래스
+ * function : shake 알고리즘의 계산을 수행
+ * @Author : 조재영
  */
 public class LocationHolder {
     private float lastX, lastY, lastZ;
@@ -29,7 +31,9 @@ public class LocationHolder {
     }
 
     public float calculateSubtraction() {
-        float result = x + y + z - (lastX + lastY + lastZ);
+        //값계산이 장애인처럼되서 좌측으로만 계산
+//        float result = (x + y + z) - (lastX + lastY + lastZ);
+        float result = x-lastX;
         return result;
     }
 }
