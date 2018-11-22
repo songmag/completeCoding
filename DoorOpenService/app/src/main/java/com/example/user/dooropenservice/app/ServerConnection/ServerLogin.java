@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+
 /*
  * ServerLogin
  * 서버에 로그인을 요청하는 스레드
@@ -19,9 +20,9 @@ import java.io.PrintWriter;
  */
 public class ServerLogin extends ServerConnection {
 
-
+    private static final String KEY = "ase256-run-key!!!";
     //사용자 정보 객체
-    private UserVO user;
+
     private JSONObject Juser;
 
     protected String Result = ""; //서버에서 날라온 결과를 저장하는 String
@@ -35,25 +36,32 @@ public class ServerLogin extends ServerConnection {
 
     public ServerLogin(UserVO user, ILoginCallback callback) {
         super(callback);
-        this.user = user;
 
         Juser = new JSONObject();
         //JSON 데이터 삽입
         try {
-            Juser.put("id", Integer.parseInt(user.getId()));
-            Juser.put("password", Integer.parseInt(user.getPassword()));
+            String encryptionPassword = getEncryption(user);//암호화
+            Juser.put("id", user.getId());
+            Juser.put("password", encryptionPassword);
+            Juser.put("company",user.getCompany());
+            Juser.put("name",user.getName());
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (NumberFormatException e) { //숫자가 아닌 문자가 들어올 경우
             callback.FailToLogin();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
+    private String getEncryption(UserVO user) throws Exception{
+        AES256Util util = new AES256Util(KEY);
+        String encryptionPassword = util.aesEncode(user.getPassword());
+        return encryptionPassword;
+    }
     @Override
     public void run() {
         super.run();
-
-        if (writer != null) {
+         if (writer != null) {
             sendData();//데이터 보내기
         }
         if (reader != null) {

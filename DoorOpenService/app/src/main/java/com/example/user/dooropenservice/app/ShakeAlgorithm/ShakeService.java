@@ -1,12 +1,19 @@
 package com.example.user.dooropenservice.app.ShakeAlgorithm;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Vibrator;
 
+import com.example.user.dooropenservice.R;
+import com.example.user.dooropenservice.app.Activity.MainActivity;
 import com.example.user.dooropenservice.app.BlueToothThread.BluetoothThread;
 
 
@@ -128,4 +135,5 @@ public class ShakeService implements SensorEventListener, IShakeCallback {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         //센서의 정확도 값이 바뀔 때 호출
     }
+
 }

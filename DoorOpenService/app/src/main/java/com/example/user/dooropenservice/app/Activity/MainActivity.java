@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.DoorOpenService.DoorOpenService;
 import com.example.user.dooropenservice.app.ServerConnection.ServerLogOut;
+import com.example.user.dooropenservice.app.ServerConnection.UserVO;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
     ServerLogOut serverLogOut;//서버에서 flag 를 바꾸기 위한 로그아웃 스레드
 
     JSONObject userID;//현재 사용중인 사용자 ID를 담을 JsonObject;
-    String id;//사용자 id
+
+    UserVO user;
+
 
     SharedPreferences preferences;
     @Override
@@ -41,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
         //로그인정보를 가져오는 작업
         preferences = getSharedPreferences("LoginInfo",0);
-        id = preferences.getString("id","");
+        user = new UserVO(preferences.getString("id",""),null,null,null);
+
 
 
 
@@ -53,8 +57,10 @@ public class MainActivity extends AppCompatActivity {
                 userID = new JSONObject();
                 //JSON 데이터 삽입
                 try {
-                    userID.put("id", Integer.parseInt(id));
-                    userID.put("password",null);
+                    userID.put("id", user.getId());
+                    userID.put("password",user.getPassword());
+                    userID.put("company",user.getCompany());
+                    userID.put("name",user.getName());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -64,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 //로그아웃을 하면 정보를 지운다
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.remove("id");
-                editor.commit();
+                editor.apply();
+                stopService(new Intent(getApplicationContext(),DoorOpenService.class));
                 finish();
             }
         });
@@ -81,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        finishAffinity();
     }
     private void CheckingBluetoothState() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();

@@ -13,9 +13,9 @@ import java.net.Socket;
 abstract class ServerConnection extends Thread {
 
     //서버통신관련 변수
-    private final String SERVER_IP = "221.146.111.40";//서버의 아이피 주소(제섭이형네 아이피주소)
+//    private final String SERVER_IP = "221.146.111.40";//서버의 아이피 주소(제섭이형네 아이피주소)
 //    private final String SERVER_IP = "210.205.46.5";//우리집(재영이집 아이피주소)
-//    private final String SERVER_IP = "169.254.154.205";//변경되는 IP
+    private final String SERVER_IP = "192.168.123.108";//변경되는 IP
     private int port = 5050;//사용할 포트넘버
 
     //서버통신관련 객체
@@ -27,17 +27,13 @@ abstract class ServerConnection extends Thread {
 
     public ServerConnection(ILoginCallback callback) {
         this.callback = callback;
+
     }
 
     @Override
-    public void run() {
-        try {
-            settingSocket(); //서버 연결
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void run(){
+        settingSocket();
     }
-
     protected abstract void sendData();
 
 

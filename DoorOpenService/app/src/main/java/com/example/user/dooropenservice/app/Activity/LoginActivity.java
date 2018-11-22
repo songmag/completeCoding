@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -41,31 +42,31 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //앱을 메모리에서 제거 하였다 다시 실행할시 SharedPreference 를 확인하여 skip 한다.
-        SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
-        id = preferences.getString("id","");
-        if(!id.equals("")){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
+        //위치 권한 동의 설정
+        if(getLocationMode()==0){
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            Toast.makeText(getApplicationContext(),"높은 정확도 사용을 권장합니다.",Toast.LENGTH_LONG).show();
         }
-
         //위치정보 허가받기 (RunTime Permission Check)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
+
+       checkLoginState();//현재 로그인상태를 확인하기 위함
+
+
         //로그인을 위한 콜백함수 구현
         callback = new ILoginCallback() {
             @Override
             public void StartService() {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                 //로그인이 되어 실행이 되면 현재 로그인정보를 저장한다.
                 SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("id",ID.getText().toString());
-                editor.commit();
+                editor.apply();
 
                 startActivity(intent);
             }
@@ -101,7 +102,7 @@ public class LoginActivity extends Activity {
             public void onClick(View v) {
 
                 //로그인 동작에 대한 로직
-                user = new UserVO(ID.getText().toString(), PassWord.getText().toString()); //사용자 정보 저장
+                user = new UserVO(ID.getText().toString(), PassWord.getText().toString(),null,null); //사용자 정보 저장
                 if (user.getId().equals("")) {
                     Toast.makeText(getApplicationContext(), "아이디를 입력하시오", Toast.LENGTH_SHORT).show();
                 }
@@ -120,6 +121,26 @@ public class LoginActivity extends Activity {
 
             }
         });
+    }
+
+    private void checkLoginState(){
+        //앱을 메모리에서 제거 하였다 다시 실행할시 SharedPreference 를 확인하여 skip 한다.
+        SharedPreferences preferences = getSharedPreferences("LoginInfo",0);
+        id = preferences.getString("id","");
+        if(!id.equals("")){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        }
+    }
+
+    public int getLocationMode(){
+        try {
+            return Settings.Secure.getInt(getApplicationContext().getContentResolver(),Settings.Secure.LOCATION_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
 

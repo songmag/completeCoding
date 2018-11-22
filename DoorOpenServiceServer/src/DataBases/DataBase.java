@@ -29,7 +29,7 @@ public class DataBase {
 	}
 
 	public void LogoutClient(JsonObject data) {
-		String query = "update member set flag='0' where id = '"+data.get("id")+"'";
+		String query = "update member set flag='0' where id = '"+data.get("id").toString().replace("\"", "")+"'";
 		try {
 			System.out.println("로그아웃 플래그 변경");
 			stat.execute(query);
@@ -51,9 +51,11 @@ public class DataBase {
 	 */
 	public int IsClient(JsonObject data) {
 		int returnValue = LOGIN_FAIL;
+		String temp = data.get("id").toString();
+		System.out.println(temp.replace("\"",""));
 		
-		String query = "select * from member where id='" + data.get("id") + "' and " + "password ='"
-				+ data.get("password") + "'";
+		String query = "select * from member where id='" + data.get("id").toString().replace("\"", "") + "' and " + "password ='"
+				+ data.get("password").toString().replace("\"", "") + "'";
 		result = new UserVO();
 		try {
 			rs = stat.executeQuery(query);
@@ -68,7 +70,8 @@ public class DataBase {
 			returnValue = findLoginState(data);
 			switch (returnValue) {
 			case LOGIN_OK: // 로그인 성공
-				String updateQuery = "update member set flag = '1' where id = '" + result.getId() + "'";// 로그인 플래그 변동
+				String updateQuery = "update member set flag = '1' where id = '" + result.getId().toString().replace("\"", "") + "'";// 로그인 플래그 변동
+				System.out.println("로그아웃 데이터 : "+data.size());
 				stat.executeQuery(updateQuery);
 				break;
 			case LOGIN_FAIL: // 로그인 실패
