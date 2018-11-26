@@ -1,11 +1,13 @@
-package com.example.user.dooropenservice.app.ServerConnection;
+package com.example.user.dooropenservice.app.Server.ServerConnection;
 
-import org.json.JSONObject;
+import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
+import com.example.user.dooropenservice.app.Server.UserVO;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+
 /*
  * ServerLogOut Thread
  * 서버에 로그아웃을 요청하는 스레드
@@ -17,23 +19,20 @@ import java.io.PrintWriter;
 public class ServerLogOut extends ServerConnection {
 
     protected BufferedWriter writer;//데이터 전송객체
-    JSONObject userID;
 
-    public ServerLogOut(JSONObject userID) {
-        super(null);
-        this.userID=userID;
-
+    public ServerLogOut(UserVO userID, ILogoutCallback callback) {
+        super(userID, callback);
     }
 
     @Override
     public void run() {
         super.run();
-        if (writer != null) {
-            sendData();//데이터 보내기
-        }
         try {
-            if(writer!=null)
-            writer.close();
+            if (writer != null) {
+                sendData();//데이터 보내기
+            }
+            if (writer != null)
+                writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,16 +40,17 @@ public class ServerLogOut extends ServerConnection {
     }
 
     @Override
-    protected void sendData() {
+    protected void sendData()   {
         PrintWriter out = new PrintWriter(writer, true);
-        out.println(userID);
+        out.println(getJuser());
     }
+
     @Override
-    protected void settingSocket(){
+    protected void settingSocket() {
         super.settingSocket();
         try {
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

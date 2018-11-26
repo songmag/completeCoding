@@ -29,7 +29,8 @@
             android:name=".app.DoorOpenService.DoorOpenService"
             android:process=":remote" />
 
-        <activity android:name=".SignInActivity"></activity>
+        <activity android:name=".app.Activity.SignUpActivity"></activity>
+        <activity android:name=".app.Activity.SelectCompanyActivity" android:theme="@android:style/Theme.DeviceDefault.Dialog"/>
     </application>
 
 </manifest>

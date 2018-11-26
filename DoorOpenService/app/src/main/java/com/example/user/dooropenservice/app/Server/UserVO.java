@@ -1,4 +1,4 @@
-package com.example.user.dooropenservice.app.ServerConnection;
+package com.example.user.dooropenservice.app.Server;
 
 public class UserVO {
     private String id;

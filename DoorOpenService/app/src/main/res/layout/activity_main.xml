@@ -30,5 +30,5 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="116dp"
-        android:text="Button" />
+        android:text="로그아웃" />
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.example.user.dooropenservice.app.ServerConnection;
+package com.example.user.dooropenservice.app.Server;
 
 import org.apache.commons.codec.binary.Base64;
 

@@ -11,11 +11,9 @@ import android.widget.Toast;
 
 import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.DoorOpenService.DoorOpenService;
-import com.example.user.dooropenservice.app.ServerConnection.ServerLogOut;
-import com.example.user.dooropenservice.app.ServerConnection.UserVO;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
+import com.example.user.dooropenservice.app.Server.ServerConnection.ServerLogOut;
+import com.example.user.dooropenservice.app.Server.UserVO;
 
 /*
  * MainActivity
@@ -31,64 +29,37 @@ public class MainActivity extends AppCompatActivity {
 
     ServerLogOut serverLogOut;//서버에서 flag 를 바꾸기 위한 로그아웃 스레드
 
-    JSONObject userID;//현재 사용중인 사용자 ID를 담을 JsonObject;
 
     UserVO user;
 
-
+    ILogoutCallback callback;
     SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //로그인정보를 가져오는 작업
-        preferences = getSharedPreferences("LoginInfo",0);
-        user = new UserVO(preferences.getString("id",""),null,null,null);
+        preferences = getSharedPreferences("LoginInfo", 0);
+        user = new UserVO(preferences.getString("id", ""), null, null, null);
 
-
-
-
-        //로그아웃버튼
-        logOutBtn = findViewById(R.id.logout);
-        logOutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                userID = new JSONObject();
-                //JSON 데이터 삽입
-                try {
-                    userID.put("id", user.getId());
-                    userID.put("password",user.getPassword());
-                    userID.put("company",user.getCompany());
-                    userID.put("name",user.getName());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                serverLogOut = new ServerLogOut(userID);
-                serverLogOut.setName("serverLogout");
-                serverLogOut.start();
-                //로그아웃을 하면 정보를 지운다
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.remove("id");
-                editor.apply();
-                stopService(new Intent(getApplicationContext(),DoorOpenService.class));
-                finish();
-            }
-        });
         //블루투스 이용 가능상태 확인
         CheckingBluetoothState();
+
+        //로그아웃 버튼에 대한 셋팅
+        LogoutSetting();
 
         //DoorOpenService 실행
         Intent intent = new Intent(getApplicationContext(), DoorOpenService.class);
         startService(intent);
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
+
     private void CheckingBluetoothState() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -101,6 +72,37 @@ public class MainActivity extends AppCompatActivity {
 
             startActivity(enableIntent);
         }
+    }
+
+    private void LogoutSetting(){
+        //로그아웃 콜백 구현
+        callback = new ILogoutCallback() {
+            @Override
+            public void ServerError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "서버연결이 끊겼습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        };
+        //로그아웃버튼
+        logOutBtn = findViewById(R.id.logout);
+        logOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                serverLogOut = new ServerLogOut(user, callback);
+                serverLogOut.setName("serverLogout");
+                serverLogOut.start();
+                //로그아웃을 하면 정보를 지운다
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.remove("id");
+                editor.apply();
+                stopService(new Intent(getApplicationContext(), DoorOpenService.class));
+                finish();
+            }
+        });
     }
 
 }

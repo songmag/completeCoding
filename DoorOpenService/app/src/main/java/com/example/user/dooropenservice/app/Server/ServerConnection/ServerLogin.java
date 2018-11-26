@@ -1,7 +1,7 @@
-package com.example.user.dooropenservice.app.ServerConnection;
+package com.example.user.dooropenservice.app.Server.ServerConnection;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILoginCallback;
+import com.example.user.dooropenservice.app.Server.UserVO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,45 +19,19 @@ import java.io.PrintWriter;
  * 상호작용 : LoginActivity , ILoginCallback
  */
 public class ServerLogin extends ServerConnection {
-
-    private static final String KEY = "ase256-run-key!!!";
-    //사용자 정보 객체
-
-    private JSONObject Juser;
-
     protected String Result = ""; //서버에서 날라온 결과를 저장하는 String
 
-    private static final int LOGIN_OK = 1; //로그인 성공
-    private static final int NO_DATA = 2; //데이터베이스에 저장된 정보 없음
-    private static final int LOGIN_FAIL = 3; //로그인 실패
+    public static final int LOGIN_OK = 1; //로그인 성공
+    public static final int NO_DATA = 2; //데이터베이스에 저장된 정보 없음
+    public static final int LOGIN_FAIL = 3; //로그인 실패
 
     protected BufferedReader reader;//데이터 수신객체
     protected BufferedWriter writer;//데이터 전송객체
 
     public ServerLogin(UserVO user, ILoginCallback callback) {
-        super(callback);
+        super(user,callback);
+    }
 
-        Juser = new JSONObject();
-        //JSON 데이터 삽입
-        try {
-            String encryptionPassword = getEncryption(user);//암호화
-            Juser.put("id", user.getId());
-            Juser.put("password", encryptionPassword);
-            Juser.put("company",user.getCompany());
-            Juser.put("name",user.getName());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException e) { //숫자가 아닌 문자가 들어올 경우
-            callback.FailToLogin();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    private String getEncryption(UserVO user) throws Exception{
-        AES256Util util = new AES256Util(KEY);
-        String encryptionPassword = util.aesEncode(user.getPassword());
-        return encryptionPassword;
-    }
     @Override
     public void run() {
         super.run();
@@ -86,11 +60,11 @@ public class ServerLogin extends ServerConnection {
                     if (Result!=null) {//결과값이 돌아왓을 때
                         int flag = Integer.parseInt(Result);
                         switch (flag){
-                            case LOGIN_OK :callback.StartService();//인증성공
+                            case LOGIN_OK :((ILoginCallback)callback).StartService();//인증성공
                                 break;
-                            case NO_DATA :callback.NoData();//인증실패(ID나 PASSWORD 중 하나가 잘못됨)
+                            case NO_DATA :((ILoginCallback)callback).NoData();//인증실패(ID나 PASSWORD 중 하나가 잘못됨)
                                 break;
-                            case LOGIN_FAIL : callback.FailToLogin();//DB에 데이터가 없는 경우
+                            case LOGIN_FAIL : ((ILoginCallback)callback).FailToLogin();//DB에 데이터가 없는 경우
                                 break;
 
                         }
@@ -113,7 +87,7 @@ public class ServerLogin extends ServerConnection {
     @Override
     protected void sendData() {
         PrintWriter out = new PrintWriter(writer, true);
-        out.println(Juser);
+        out.println(getJuser());
     }
     @Override
     protected void settingSocket(){

@@ -1,4 +1,7 @@
-package com.example.user.dooropenservice.app.ServerConnection;
+package com.example.user.dooropenservice.app.Server.ServerCallbackInterface;
+
+import javax.security.auth.callback.Callback;
+
 /*
  * ILoginCallback
  * 로그인동작을 관리할 Callback 메소드를 가진 인터페이스
@@ -6,8 +9,9 @@ package com.example.user.dooropenservice.app.ServerConnection;
  * 상호작용 : ServerLogin(동작결정) , LoginActivity(동작구현)
  * @Author : 조재영
  */
-public interface ILoginCallback {
+public interface ILoginCallback extends Callback {
     void StartService();
     void FailToLogin();
     void NoData();
+    void ServerConnectionError();
 }
