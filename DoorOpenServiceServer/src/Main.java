@@ -1,11 +1,8 @@
 
 import com.google.gson.JsonObject;
-
-import CapPackage.DataBase;
 import Server.UserServer;
 
 public class Main {
-
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		UserServer userServer = new UserServer();
