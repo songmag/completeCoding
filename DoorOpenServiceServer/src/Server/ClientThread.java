@@ -44,6 +44,7 @@ public class ClientThread extends Thread {
 					new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
 			System.out.println("Flag change : " + i_db.excute(data));
 			writer.println(i_db.excute(data));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
