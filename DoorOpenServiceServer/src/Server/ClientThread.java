@@ -17,7 +17,7 @@ public class ClientThread extends Thread {
 	PrintWriter writer; // Client로 데이터를 보내기 위한 객체
 	
 	Socket client;
-	
+	String company;
 	DataBase db; // DataBase관리 객체
 	public ClientThread(Socket client) {
 		db = new DataBase();
@@ -39,15 +39,28 @@ public class ClientThread extends Thread {
 			JsonParser parser = new JsonParser();
 			JsonObject data = (JsonObject) parser.parse(reader.readLine());
 			
-			System.out.println("읽어들인 값 : " + data.get("id") + data.get("password"));
-
+			System.out.println("읽어들인 값 : " + data.get("id") + data.get("password")+data.get("company")+data.get("name"));
+			if(data.get("company")!=null) {
+			 company = data.get("company").toString().replace("\"", "");
+			 if(company.equals("1")) {//company정보
+					System.out.println("앙 들어왔띠");
+					writer = new PrintWriter(
+							new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
+					JsonObject result = new JsonObject();
+					result.addProperty("company", "sejong");
+					result.addProperty("latitude", 123.33);
+					result.addProperty("longitude", 127.11);
+					result.addProperty("scope", 300.0);
+					writer.println(result);
+				}
+			}
 			db.connectDB();// db와 연결
 			
 			if(data.get("password")==null) {//로그아웃 
 				System.out.println("로그아웃");
 				db.LogoutClient(data);
 			}
-			else {//로그인
+			else if(data.get("id")!=null&&data.get("password")!=null&&data.get("company")==null){//로그인
 				int flag = db.IsClient(data);// 있는 고객인지 아닌지 확인
 
 				writer = new PrintWriter(
@@ -55,6 +68,7 @@ public class ClientThread extends Thread {
 				System.out.println("보낼 값 : " + flag);
 				writer.println(flag);
 			}
+			
 			
 
 		} catch (Exception e) {

@@ -2,6 +2,7 @@ package com.example.user.dooropenservice.app.Activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
@@ -12,8 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.dooropenservice.R;
-import com.example.user.dooropenservice.app.Server.ServerConnection.ServerSignUp;
-import com.example.user.dooropenservice.app.Server.UserVO;
 
 import java.util.regex.Pattern;
 
@@ -30,8 +29,11 @@ public class SignUpActivity extends AppCompatActivity {
     private boolean CONFIRM_PW_OK = false;
     private boolean CONFIRM_NAME_OK = false;
     private boolean CONFIRM_COMPANY_OK = false;
+    private boolean CHECK_ASYNCTASK = true;
 
     Intent intent;
+
+    private long backKeyPressedTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         SetContents();
 
+        StartASyncTask();
     }
 
     //영문,숫자만 입력(한글 필터링)
@@ -98,12 +101,7 @@ public class SignUpActivity extends AppCompatActivity {
                 break;
 
             case R.id.finishBtn:
-
                 if (checkSignUp()) {
-                    /*
-                    UserVO user; //UserVo만들어서 여기다가 회원데이터 다 꼬라박기
-                    ServerSignUp serverSignUp = new ServerSignUp(UserVo,Callback); //콜백은 아직 미구현
-                    */
                     Toast.makeText(getApplicationContext(), "회원가입이 완료되었습니다.", Toast.LENGTH_LONG).show();
                     finish();
                 } else {
@@ -124,24 +122,6 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    //스레드 써야됨
-    private void checkPassword() {
-        user_pw = pw.getText().toString();
-        user_pw2 = pw_2.getText().toString();
-
-        if (user_pw.length() < 6 || user_pw.length() > 16) {
-            pw_signal.setText("형식이 맞지 않습니다.");
-            pw_signal.setTextColor(Color.parseColor("#FF8888"));
-        } else if (user_pw.equals(user_pw2)) {
-            CONFIRM_PW_OK = true;
-            pw_signal.setText("사용가능");
-            pw_signal.setTextColor(Color.parseColor("#99FF99"));
-        } else {
-            pw_signal.setText("비밀번호가 일치하지 않습니다.");
-            pw_signal.setTextColor(Color.parseColor("#FF8888"));
-        }
-    }
-
     private void checkUserName() {
         user_name = name.getText().toString();
 
@@ -159,13 +139,75 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private boolean checkSignUp() {
-        checkPassword();
         checkUserName();
         checkCompName();
 
-        if (CONFIRM_NAME_OK && CONFIRM_ID_OK && CONFIRM_PW_OK && CONFIRM_COMPANY_OK)
+        if (CONFIRM_NAME_OK && CONFIRM_ID_OK && CONFIRM_PW_OK && CONFIRM_COMPANY_OK) {
+            CHECK_ASYNCTASK = false;
             return true;
+        }
         else
             return false;
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(System.currentTimeMillis() > backKeyPressedTime + 2000){
+            backKeyPressedTime = System.currentTimeMillis();
+            Toast.makeText(getApplicationContext(),"회원가입을 취소하려면 \'뒤로\'버튼을 한번 더 눌러주세요.",Toast.LENGTH_LONG).show();
+            return;
+        }
+        if(System.currentTimeMillis() <= backKeyPressedTime + 2000){
+            finish();
+        }
+    }
+
+    @Override
+    public void onDestroy(){
+        CHECK_ASYNCTASK = false;
+        super.onDestroy();
+    }
+
+    public class MyAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... progress) {
+            while(CHECK_ASYNCTASK){
+                try{
+                    publishProgress();
+                    Thread.sleep(1000);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... progress) {
+            user_pw = pw.getText().toString();
+            user_pw2 = pw_2.getText().toString();
+
+            if (user_pw.length() < 6 || user_pw.length() > 16) {
+                pw_signal.setText("형식이 맞지 않습니다.");
+                pw_signal.setTextColor(Color.parseColor("#FF8888"));
+            } else if (user_pw.equals(user_pw2)) {
+                CONFIRM_PW_OK = true;
+                pw_signal.setText("사용가능");
+                pw_signal.setTextColor(Color.parseColor("#99FF99"));
+            } else {
+                pw_signal.setText("비밀번호가 일치하지 않습니다.");
+                pw_signal.setTextColor(Color.parseColor("#FF8888"));
+            }
+        }
+    }
+
+    private void StartASyncTask(){
+        MyAsyncTask mTask = new MyAsyncTask();
+        mTask.execute();
     }
 }

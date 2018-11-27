@@ -1,6 +1,8 @@
 package com.example.user.dooropenservice.app.Server;
 
-public class UserVO {
+import java.io.Serializable;
+
+public class UserVO implements Serializable {
     private String id;
     private String password;
     private String company;

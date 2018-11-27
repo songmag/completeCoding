@@ -27,6 +27,7 @@ public class DoorOpenService extends Service {
 
     static final int DOOR_OPEN_SERVICE_ID = 1;
     private static ShakeService shakeService;
+
     double distance;
     double sejong_latitude = 37.550437;
     double sejong_longitude = 127.073828;
@@ -39,6 +40,7 @@ public class DoorOpenService extends Service {
     boolean isNetworkEnabled = false;
     boolean isGPSEnabled = false;
     boolean isGetLocation = false;
+
     Location mLocation;
 
     @Nullable
@@ -49,7 +51,6 @@ public class DoorOpenService extends Service {
 
     private class LocationListener implements android.location.LocationListener {
 
-
         public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLocation = new Location(provider);
@@ -57,7 +58,7 @@ public class DoorOpenService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            if(location!=null) {
+            if (location != null) {
                 Log.e(TAG, "onLocationChanged : " + location);
                 mLocation.set(location);
                 Log.i(TAG, "GPS : " + location.getLatitude() + "/" + location.getLongitude() + "");
@@ -82,7 +83,6 @@ public class DoorOpenService extends Service {
                     }
                 }
             }
-
         }
 
         @Override
@@ -140,78 +140,50 @@ public class DoorOpenService extends Service {
     public void onCreate() {
         initializeLocationManager();
         setNotification(); //백그라운드 서비스를 유지하기위한 설정 (이거는 유지 onCreate에 있어야 함)
-        /*try {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[1]);
-        } catch (SecurityException e) {
-            Log.i(TAG, "fail to request location update, ignore", e);
-        } catch (IllegalArgumentException e) {
-            Log.d(TAG, "network provider does not exist, " + e.getMessage());
-        }
 
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[0]);
-        } catch (SecurityException e) {
-            Log.i(TAG, "fail to request location update, ignore", e);
-        } catch (IllegalArgumentException e) {
-            Log.d(TAG, "gps provider does no exist, " + e.getMessage());
-        }*/
+        getLocationManager();
+
+    }
+
+    public void getLocationManager(){
+
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        if (isNetworkEnabled) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
 
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                //둘다 안될 때 구현(필요없을 듯)
-            } else {
-                isGetLocation = true;
 
-                if (isNetworkEnabled) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[1]);
+        if (!isGPSEnabled && !isNetworkEnabled) {
+            //둘다 안될 때 구현(필요없을 듯)
+        } else {
+            isGetLocation = true;
 
-                    if (locationManager != null) {
-                        mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    }
-                    if (isGPSEnabled) {
-                        if (mLocation == null) {
-                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[0]);
-                            if (locationManager != null) {
-                                mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            }
+            if (isNetworkEnabled) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[1]);
+
+                if (locationManager != null) {
+                    mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+                if (isGPSEnabled) {
+                    if (mLocation == null) {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[0]);
+                        if (locationManager != null) {
+                            mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
                     }
                 }
             }
         }
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

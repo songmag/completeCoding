@@ -7,6 +7,8 @@ import com.example.user.dooropenservice.app.Server.UserVO;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 public class ServerSignUp extends ServerConnection {
@@ -15,6 +17,17 @@ public class ServerSignUp extends ServerConnection {
 
     protected BufferedReader reader;//데이터 수신객체
     protected BufferedWriter writer;//데이터 전송객체
+
+    @Override
+    protected void settingSocket() {
+        super.settingSocket();
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 
     public static final int DUPLICATE_ID = 4; //아이디 중복
     public static final int SUCCESS = 5;//연결 성공

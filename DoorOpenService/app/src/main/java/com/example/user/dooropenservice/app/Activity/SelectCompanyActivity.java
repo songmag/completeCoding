@@ -1,4 +1,5 @@
 package com.example.user.dooropenservice.app.Activity;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +16,6 @@ public class SelectCompanyActivity extends Activity {
     RadioGroup radioGroup;
     String companyName = "세종대학교";
     Intent intent;
-
     private final int RESULT_OK=100;
 
     protected void onCreate(Bundle savedInstanceState){

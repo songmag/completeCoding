@@ -26,7 +26,7 @@ abstract class ServerConnection extends Thread {
     //서버통신관련 변수
 //    private final String SERVER_IP = "221.146.111.40";//서버의 아이피 주소(제섭이형네 아이피주소)
 //    private final String SERVER_IP = "210.205.46.5";//우리집(재영이집 아이피주소)
-    private final String SERVER_IP = "192.168.42.236";//변경되는 IP
+    private final String SERVER_IP = "172.16.0.229";//변경되는 IP
     private int port = 5050;//사용할 포트넘버
 
     //서버통신관련 객체
@@ -86,6 +86,11 @@ abstract class ServerConnection extends Thread {
                 }
                 else if(callback instanceof ILoginCallback){
                     ((ILoginCallback)callback).ServerConnectionError(); //서버연결오류
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
 
             e.printStackTrace();

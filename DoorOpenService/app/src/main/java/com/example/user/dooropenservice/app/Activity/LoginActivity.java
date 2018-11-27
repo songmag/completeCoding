@@ -48,7 +48,7 @@ public class LoginActivity extends Activity {
         getViewInfo();//뷰에대한정보들을 가져온다
 
         //로그인에 관련된 메소드들
-        checkLoginState();//현재 로그인상태를 확인하기 위함
+//        checkLoginState();//현재 로그인상태를 확인하기 위함
         settingCallback(); //로그인 콜백메소드 셋팅
         setLoginButton(); //로그인 버튼 셋팅
 
@@ -95,12 +95,14 @@ public class LoginActivity extends Activity {
             public void StartService() {
                 Intent MainActivityintent = new Intent(getApplicationContext(), MainActivity.class);
 //                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                MainActivityintent.putExtra("userVO",user);//인텐트에 로그인에 대한 정보를 넣어줌
+
 
                 //로그인이 되어 실행이 되면 현재 로그인정보를 저장한다.
-                SharedPreferences preferences = getSharedPreferences("LoginInfo", 0);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("id", ID.getText().toString());
-                editor.apply();
+//                SharedPreferences preferences = getSharedPreferences("LoginInfo", 0);
+//                SharedPreferences.Editor editor = preferences.edit();
+//                editor.putString("id", ID.getText().toString());
+//                editor.apply();
 
                 startActivity(MainActivityintent);
             }
