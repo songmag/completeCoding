@@ -31,9 +31,7 @@ public class DoorOpenService extends Service {
     static final int DOOR_OPEN_SERVICE_ID = 1;
     private static ShakeService shakeService;
 
-    double distance;
-    double sejong_latitude = 37.550437;
-    double sejong_longitude = 127.073828;
+    double[] distance;
 
     private static final String TAG = "TEST_GPS";
     private LocationManager locationManager = null;
@@ -46,7 +44,6 @@ public class DoorOpenService extends Service {
 
     private ArrayList<CompanyVO> companyVOArrayList;
 
-    Intent intent;
 
     Location mLocation;
 
@@ -67,25 +64,28 @@ public class DoorOpenService extends Service {
         public void onLocationChanged(Location location) {
             if (location != null) {
                 Log.e(TAG, "onLocationChanged : " + location);
+
                 mLocation.set(location);
                 Log.i(TAG, "GPS : " + location.getLatitude() + "/" + location.getLongitude() + "");
 
-                distance = getDistance(sejong_latitude, sejong_longitude, mLocation.getLatitude(), mLocation.getLongitude());
+                distance = new double[companyVOArrayList.size()];
 
-                Log.e(TAG, "Distance : " + distance + "");
+                for (int i = 0; i < companyVOArrayList.size(); i++) {
+                    distance[i] = getDistance(companyVOArrayList.get(i).getLatitude(), companyVOArrayList.get(i).getLongitude(), mLocation.getLatitude(), mLocation.getLongitude());
 
-                if (distance <= 300.0) {
-                    if (shakeService == null) {
-                        shakeService = new ShakeService(getApplicationContext());//이거를 범위 내에 들어왔을떄 만듬
-                    } else {
-                        if (!shakeService.isListenerSet()) {
-                            shakeService.registerListener();
-                        }
-                    }
-                } else {   //범위 밖으로 벗어난 경우
-                    if (shakeService != null) {
-                        if (shakeService.isListenerSet()) {
-                            shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
+                    Log.e(TAG, "Distance : " + distance[i] + "");
+
+                    if (distance[i] <= companyVOArrayList.get(i).getScope()) {
+
+                        shakeService = ShakeService.getInstance(getApplicationContext());
+                        shakeService.registerListener();
+
+
+                    } else {   //범위 밖으로 벗어난 경우
+                        if (shakeService != null) {
+                            if (shakeService.isListenerSet()) {
+                                shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
+                            }
                         }
                     }
                 }
@@ -115,15 +115,13 @@ public class DoorOpenService extends Service {
     @Override
     public void onDestroy() {
         Log.e(TAG, "onDestroy");
-        super.onDestroy();
 
         //ShakeService 의 메모리 해제
-        if (shakeService != null) {
-            if (shakeService.isListenerSet()) {
-                shakeService.removeListener();
-                shakeService = null;
-            }
+
+        if(shakeService!=null) {
+            shakeService.removeListener();
         }
+
 
         if (locationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
@@ -152,7 +150,17 @@ public class DoorOpenService extends Service {
 
     }
 
-    public void getLocationManager(){
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
+        companyVOArrayList = (ArrayList<CompanyVO>) intent.getSerializableExtra("ArrayList");
+        Log.e(TAG, "company : " + companyVOArrayList.get(0).getCompany() + "/lat : " + companyVOArrayList.get(0).getLatitude() + "/lon : " + companyVOArrayList.get(0).getLongitude() + "/scope : " + companyVOArrayList.get(0).getScope());
+
+        return START_STICKY;
+    }
+
+    public void getLocationManager() {
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
@@ -190,20 +198,6 @@ public class DoorOpenService extends Service {
         }
     }
 
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand");
-        super.onStartCommand(intent, flags, startId);
-
-        companyVOArrayList = new ArrayList<>();
-
-        companyVOArrayList = (ArrayList<CompanyVO>) intent.getSerializableExtra("ArrayList");
-
-        Log.e(TAG,"company : "+companyVOArrayList.get(0).getCompany() + "/lat : " + companyVOArrayList.get(0).getLatitude() + "/lon : "+ companyVOArrayList.get(0).getLongitude() + "/scope : " + companyVOArrayList.get(0).getScope());
-
-        return START_STICKY;
-    }
 
     //Notification을 추가함으로써 ForeGround에 Service가 실행되고있음을 보임으로써 Service 종료 방지
     public void setNotification() {

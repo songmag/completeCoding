@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.user.dooropenservice.app.ShakeAlgorithm.IShakeCallback;
@@ -72,14 +73,13 @@ public class BluetoothThread extends Thread {
 
     @Override
     public void interrupt() {
-        if(!shakeCallback.isListenerSet()) {
+
             shakeCallback.registerListener(); //Shake 리스너 재등록
-        }
+
 
         bluetoothAdapter = null;
-        if (outputStream != null) {
+        if (socket != null) {
             try {
-                outputStream.close();
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -170,10 +170,14 @@ public class BluetoothThread extends Thread {
             beginListenForData();
 
 
+        }
+         catch (IOException e) {
+            //timeOut일떄
+             Log.e("ShakeBluetooth TimeOut",e.getMessage());
+             this.interrupt();
+            e.printStackTrace();
         } catch (Exception e) {
-            this.interrupt();
-            // 블루투스 연결 중 오류 발생
-
+            e.printStackTrace();
         }
     }
 

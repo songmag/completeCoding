@@ -14,7 +14,8 @@ import com.example.user.dooropenservice.R;
 public class SelectCompanyActivity extends Activity {
     Button finishBtn;
     RadioGroup radioGroup;
-    String companyName = "세종대학교";
+    String companyName = "sejong";
+    String textCompany ="세종대학교";
     Intent intent;
     private final int RESULT_OK=100;
 
@@ -34,13 +35,16 @@ public class SelectCompanyActivity extends Activity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.sejongUniv:
-                        companyName = "세종대학교";
+                        textCompany = "세종대학교";
+                        companyName = "sejong";
                         break;
                     case R.id.konkukUniv:
-                        companyName = "건국대학교";
+                        textCompany = "건국대학교";
+                        companyName = "konkuk";
                         break;
                     case R.id.samsungElec:
-                        companyName = "삼성전자";
+                        textCompany = "삼성 전자";
+                        companyName = "samsung";
                         break;
                     default:
                         companyName = "더미";
@@ -53,6 +57,7 @@ public class SelectCompanyActivity extends Activity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("compName",companyName);
+                intent.putExtra("textCompany",textCompany);
                 Toast.makeText(getApplicationContext(),companyName,Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK,intent);
                 finish();

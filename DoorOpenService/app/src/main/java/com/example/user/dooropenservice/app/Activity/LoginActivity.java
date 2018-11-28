@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +17,7 @@ import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.Model.UserVO;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILoginCallback;
 import com.example.user.dooropenservice.app.Server.ServerConnection.ServerLogin;
+import com.example.user.dooropenservice.app.ShakeAlgorithm.ShakeService;
 
 /*
  * LoginActivity
@@ -89,23 +89,15 @@ public class LoginActivity extends Activity {
         }
     }
 
-    public int getLocationMode() {
-        try {
-            return Settings.Secure.getInt(getApplicationContext().getContentResolver(), Settings.Secure.LOCATION_MODE);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
+
 
     private void settingCallback() {
         //로그인을 위한 콜백함수 구현
         callback = new ILoginCallback() {
             @Override
             public void StartService() {
-                Intent MainActivityintent = new Intent(getApplicationContext(), MainActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                MainActivityintent.putExtra("userVO",user);//인텐트에 로그인에 대한 정보를 넣어줌
+                Intent MainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                MainActivityIntent.putExtra("userVO",user);//인텐트에 로그인에 대한 정보를 넣어줌
 
 
                 //로그인이 되어 실행이 되면 현재 로그인정보를 저장한다.
@@ -114,12 +106,11 @@ public class LoginActivity extends Activity {
                 editor.putString("id", ID.getText().toString());
                 editor.apply();
 
-                startActivity(MainActivityintent);
+                startActivity(MainActivityIntent);
             }
 
             @Override
             public void FailToLogin() {
-                Log.e("FailToLogin", "로그인에 실패하였습니다.");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -148,6 +139,15 @@ public class LoginActivity extends Activity {
                 });
             }
         };
+    }
+
+    public int getLocationMode() {
+        try {
+            return Settings.Secure.getInt(getApplicationContext().getContentResolver(), Settings.Secure.LOCATION_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     private void checkingPermission() {
@@ -195,5 +195,6 @@ public class LoginActivity extends Activity {
             }
         });
     }
+
 
 }

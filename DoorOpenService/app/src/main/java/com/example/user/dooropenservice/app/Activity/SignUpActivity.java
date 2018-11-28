@@ -41,6 +41,8 @@ public class SignUpActivity extends AppCompatActivity {
     private IDuplicationCallback duplicationCallback;
     private long backKeyPressedTime = 0;
 
+    private String companyName="";//서버로 보낼 company이름
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,8 +120,9 @@ public class SignUpActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE) {
-            String result = data.getStringExtra("compName");
-            company.setText(result);
+            companyName = data.getStringExtra("compName");
+            String textCompany = data.getStringExtra("textCompany");
+            company.setText(textCompany);
         }
     }
 
@@ -145,7 +148,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         if (CONFIRM_NAME_OK && CONFIRM_ID_OK && CONFIRM_PW_OK && CONFIRM_COMPANY_OK) {
             CHECK_ASYNCTASK = false;
-            ServerSignUp serverSignUp = new ServerSignUp(new UserVO(user_id,user_pw,company.getText().toString(),name.getText().toString()),signUpCallback);
+            ServerSignUp serverSignUp = new ServerSignUp(new UserVO(user_id,user_pw,companyName,name.getText().toString()),signUpCallback);
             serverSignUp.setName("ServerSignUpThread");
             serverSignUp.start();
             return true;
@@ -252,14 +255,25 @@ public class SignUpActivity extends AppCompatActivity {
             }
             @Override
             public void Duplicate_ID() {
-                Toast.makeText(getApplicationContext(),"아이디가 중복됩니다.",Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"아이디가 중복됩니다.",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override
             public void access() {
-                Toast.makeText(getApplicationContext(),"인증 성공",Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"인증 성공",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 CONFIRM_ID_OK = true;
-                finish();
             }
         };
     }

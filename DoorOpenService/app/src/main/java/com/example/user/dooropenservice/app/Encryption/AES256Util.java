@@ -1,4 +1,4 @@
-package com.example.user.dooropenservice.app.Server;
+package com.example.user.dooropenservice.app.Encryption;
 
 import org.apache.commons.codec.binary.Base64;
 

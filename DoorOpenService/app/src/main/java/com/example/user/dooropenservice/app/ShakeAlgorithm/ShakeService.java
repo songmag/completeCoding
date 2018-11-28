@@ -29,52 +29,56 @@ public class ShakeService implements SensorEventListener, IShakeCallback {
     private float speed; //가속 스피드를 저장할 변수
     private static long lastTime = 0;// 시간차를 계산하기위한 변수
     private static final int SHAKE_POWER = 1200; //비교 할 Shake 의 강도 (높을수록 강하게 둔함, 낮을수록 예민)
-
+    private static ShakeService instance = null;
     //앱 정보
     Context context;
 
     //Bluetooth 관련
     BluetoothThread bluetoothThread = null;
 
-    public ShakeService(Context context) {
+    public static ShakeService getInstance(Context context) {
+        if (instance == null) {
+            instance = new ShakeService(context);
+        }
+        return instance;
+    }
+
+    private ShakeService(Context context) {
         this.context = context;
 
         //Shake정보를 담을 홀더클래스 생성
         locationHolder = new LocationHolder();
 
         //센서 리스너 등록
-        if(!isListenerSet()) {
+
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE); //SeosorManager가져오기
+        if (!isListenerSet()) {
             registerListener();
         }
         //ShakeService가 시작됨을 알리는 바이브레이터
         vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
 
-
     }
 
     //센서리스너가 등록되어있는지 아닌지 확인하는 메소드 (Implement IShakeCallback)
     @Override
-    public boolean isListenerSet(){
-        if(sensorManager==null)return false;
+    public boolean isListenerSet() {
+        if (sensorManager == null) return false;
         else return true;
     }
 
     //센서리스너 등록 메소드 (Implement IShakeCallback)
     @Override
     public void registerListener() {
-        //SeosorManager가져오기
-        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         //registerListener(Listener객체,센서타입,센서속도);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     //센서리스너 제거 메소드 (Implement IShakeCallback)
     @Override
-    public void removeListener(){
-
+    public void removeListener() {
         sensorManager.unregisterListener(this);//한번 감지가 되면 리스너를 제거해버림
-        sensorManager=null;
     }
 
 
@@ -111,7 +115,7 @@ public class ShakeService implements SensorEventListener, IShakeCallback {
                     쓰레드는 한번 사용하면 재 사용할수 없기때문에 계속 새로 생성해준다
                      */
 
-                    bluetoothThread = new BluetoothThread(this,context);
+                    bluetoothThread = new BluetoothThread(this, context);
                     bluetoothThread.setName("BluetoothThread");
                     bluetoothThread.start();
 

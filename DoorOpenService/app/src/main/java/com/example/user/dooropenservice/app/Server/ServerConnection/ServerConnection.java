@@ -1,7 +1,7 @@
 package com.example.user.dooropenservice.app.Server.ServerConnection;
 
 import com.example.user.dooropenservice.app.Model.UserVO;
-import com.example.user.dooropenservice.app.Server.AES256Util;
+import com.example.user.dooropenservice.app.Encryption.SHA256;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.IServerCallback;
 
@@ -81,21 +81,21 @@ abstract class ServerConnection extends Thread {
         }
     }
 
-    //    private String getEncryption(UserVO user){
-//        String encryptionPassword = null;
-//        if(user.getPassword()!=null) {
-//            encryptionPassword = SHA256.encrypt(user.getId());
-//        }
-//        return encryptionPassword;
-//    }
-    private String getEncryption(UserVO user) throws Exception {
+        private String getEncryption(UserVO user){
         String encryptionPassword = null;
-        AES256Util util = new AES256Util(KEY);
-        if (user.getPassword() != null) {
-            encryptionPassword = util.aesEncode(user.getPassword());
+        if(user.getPassword()!=null) {
+            encryptionPassword = SHA256.encrypt(user.getId());
         }
         return encryptionPassword;
     }
+//    private String getEncryption(UserVO user) throws Exception {
+//        String encryptionPassword = null;
+//        AES256Util util = new AES256Util(KEY);
+//        if (user.getPassword() != null) {
+//            encryptionPassword = util.aesEncode(user.getPassword());
+//        }
+//        return encryptionPassword;
+//    }
 
     @Override
     public void run() {
