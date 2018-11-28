@@ -1,7 +1,7 @@
 package com.example.user.dooropenservice.app.Server.ServerConnection;
 
+import com.example.user.dooropenservice.app.Model.UserVO;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILoginCallback;
-import com.example.user.dooropenservice.app.Server.UserVO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -92,7 +92,6 @@ public class ServerLogin extends ServerConnection {
     @Override
     protected void settingSocket(){
         super.settingSocket();
-
         try {
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));

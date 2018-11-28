@@ -13,6 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.dooropenservice.R;
+import com.example.user.dooropenservice.app.Model.UserVO;
+import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.IDuplicationCallback;
+import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ISignUpCallback;
+import com.example.user.dooropenservice.app.Server.ServerConnection.ServerDuplicateID;
+import com.example.user.dooropenservice.app.Server.ServerConnection.ServerSignUp;
 
 import java.util.regex.Pattern;
 
@@ -32,7 +37,8 @@ public class SignUpActivity extends AppCompatActivity {
     private boolean CHECK_ASYNCTASK = true;
 
     Intent intent;
-
+    private ISignUpCallback signUpCallback;
+    private IDuplicationCallback duplicationCallback;
     private long backKeyPressedTime = 0;
 
     @Override
@@ -43,6 +49,7 @@ public class SignUpActivity extends AppCompatActivity {
         SetContents();
 
         StartASyncTask();
+        CallbackSetting();
     }
 
     //영문,숫자만 입력(한글 필터링)
@@ -83,15 +90,9 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "아이디를 정확히 입력해주세요.", Toast.LENGTH_SHORT).show();
                 else {
                     //서버에서 ID 중복확인 받는 코드 , RSULT_CODE 받아야됨
-                    Toast.makeText(getApplicationContext(), user_id + "/" + "서버 접근, ID 중복확인", Toast.LENGTH_LONG).show();
-                    CONFIRM_ID_OK = true;
-                    //
-
-                    if (SERVER_ID_OK == 1000) {
-                        Toast.makeText(getApplicationContext(), "사용가능한 아이디 입니다.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
-                    }
+                    ServerDuplicateID serverDuplicateID = new ServerDuplicateID(new UserVO(user_id,null,null,null),duplicationCallback);
+                    serverDuplicateID.setName("serverDuplicateThread");
+                    serverDuplicateID.start();
                 }
                 break;
 
@@ -144,10 +145,15 @@ public class SignUpActivity extends AppCompatActivity {
 
         if (CONFIRM_NAME_OK && CONFIRM_ID_OK && CONFIRM_PW_OK && CONFIRM_COMPANY_OK) {
             CHECK_ASYNCTASK = false;
+            ServerSignUp serverSignUp = new ServerSignUp(new UserVO(user_id,user_pw,company.getText().toString(),name.getText().toString()),signUpCallback);
+            serverSignUp.setName("ServerSignUpThread");
+            serverSignUp.start();
             return true;
         }
         else
             return false;
+
+
     }
 
     @Override
@@ -209,5 +215,52 @@ public class SignUpActivity extends AppCompatActivity {
     private void StartASyncTask(){
         MyAsyncTask mTask = new MyAsyncTask();
         mTask.execute();
+    }
+
+    private void CallbackSetting(){
+        signUpCallback = new ISignUpCallback() {
+            @Override
+            public void ServerConnectionError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "서버가 열려있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void accessID() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"유효한 아이디입니다.",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        };
+
+        duplicationCallback = new IDuplicationCallback() {
+            @Override
+            public void ServerConnectionError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "서버가 열려있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            @Override
+            public void Duplicate_ID() {
+                Toast.makeText(getApplicationContext(),"아이디가 중복됩니다.",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void access() {
+                Toast.makeText(getApplicationContext(),"인증 성공",Toast.LENGTH_SHORT).show();
+                CONFIRM_ID_OK = true;
+                finish();
+            }
+        };
     }
 }

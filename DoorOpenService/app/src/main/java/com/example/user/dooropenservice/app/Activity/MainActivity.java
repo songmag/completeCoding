@@ -3,6 +3,7 @@ package com.example.user.dooropenservice.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -11,12 +12,12 @@ import android.widget.Toast;
 
 import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.DoorOpenService.DoorOpenService;
+import com.example.user.dooropenservice.app.Model.CompanyVO;
+import com.example.user.dooropenservice.app.Model.UserVO;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ICompanyCheckCallback;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
-import com.example.user.dooropenservice.app.Server.CompanyVO;
 import com.example.user.dooropenservice.app.Server.ServerConnection.ServerCompanyCheck;
 import com.example.user.dooropenservice.app.Server.ServerConnection.ServerLogOut;
-import com.example.user.dooropenservice.app.Server.UserVO;
 
 import java.util.ArrayList;
 
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     BluetoothAdapter bluetoothAdapter;
 
+
+
     Button logOutBtn;//로그아웃 버튼
 
     ServerLogOut serverLogOut;//서버에서 flag 를 바꾸기 위한 로그아웃 스레드
@@ -38,23 +41,24 @@ public class MainActivity extends AppCompatActivity {
     ILogoutCallback LogoutCallback;//로그아웃에 대한 콜백
     ICompanyCheckCallback companyCheckCallback;//company 정보에 대한 콜백
 
-//    SharedPreferences preferences; //로그인정보를 임시로 담을 내부 데이터베이스
+    SharedPreferences preferences; //로그인정보를 임시로 담을 내부 데이터베이스
 
     ServerCompanyCheck serverCompanyCheck;//서버에서 사용자의 company정보를 가져오는 클래스
     Context context;
     Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context=getApplicationContext();
+        context = getApplicationContext();
 
         //로그인정보를 가져오는 작업
         intent = getIntent();
-//        preferences = getSharedPreferences("LoginInfo", 0);
-//        user = new UserVO(preferences.getString("id", ""), null, null, null);
-        user = (UserVO)intent.getSerializableExtra("userVO");
+        user = (UserVO) intent.getSerializableExtra("userVO");
         user.setCompany("1");//서버에서 [ 로그아웃 vs company 정보 ] 확인하기위해 더미데이터를 넣어주는 작업
+
+        setResult(RESULT_OK, intent);
         //블루투스 이용 가능상태 확인
         CheckingBluetoothState();
 
@@ -65,12 +69,11 @@ public class MainActivity extends AppCompatActivity {
         getServerCompanyData();
 
 
-
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onBackPressed() {
+        return;
     }
 
     private void CheckingBluetoothState() {
@@ -87,9 +90,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void LogoutSetting(){
+    private void LogoutSetting() {
         //로그아웃 콜백 구현
         LogoutCallback = new ILogoutCallback() {
+            @Override
+            public void ServerConnectionError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "서버가 열려있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
             @Override
             public void ServerError() {
                 runOnUiThread(new Runnable() {
@@ -109,25 +122,40 @@ public class MainActivity extends AppCompatActivity {
                 serverLogOut.setName("serverLogout");
                 serverLogOut.start();
                 //로그아웃을 하면 정보를 지운다
-//                SharedPreferences.Editor editor = preferences.edit();
-//                editor.remove("id");
-//                editor.apply();
+                deletePreferencesData();
                 stopService(new Intent(getApplicationContext(), DoorOpenService.class));
                 finish();
             }
         });
     }
-    private void getServerCompanyData(){
-        companyCheckCallback =new ICompanyCheckCallback() {
+
+    private void deletePreferencesData() {
+        preferences = getSharedPreferences("LoginInfo", 0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove("id");
+        editor.apply();
+    }
+
+    private void getServerCompanyData() {
+        companyCheckCallback = new ICompanyCheckCallback() {
+            @Override
+            public void ServerConnectionError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "서버가 열려있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
             @Override
             public void startService(ArrayList<CompanyVO> companyVOArrayList) {
                 //DoorOpenService 실행 ->getServerCompanyData 에서 정보를 받아 실행시키는 형태로 제작
                 Intent intent = new Intent(getApplicationContext(), DoorOpenService.class);
-                intent.putExtra("ArrayList",companyVOArrayList);
+                intent.putExtra("ArrayList", companyVOArrayList);
                 context.startService(intent);
             }
         };
-        serverCompanyCheck = new ServerCompanyCheck(user,companyCheckCallback);
+        serverCompanyCheck = new ServerCompanyCheck(user, companyCheckCallback);
         serverCompanyCheck.start();
     }
 }

@@ -21,10 +21,10 @@ public class AES256Util {
     private Key keySpec;
 
     public AES256Util(String key) throws UnsupportedEncodingException {
-        this.iv = key.substring(0, 16);	// 0~15 index의
+        this.iv = key.substring(0, 16);   // 0~15 index의
 
-        byte[] keyBytes = new byte[16];	// 16 bytes 배열로 만듦
-        byte[] b = key.getBytes("UTF-8");	// 문자열을 bytes로 인코드 해준다
+        byte[] keyBytes = new byte[16];   // 16 bytes 배열로 만듦
+        byte[] b = key.getBytes("UTF-8");   // 문자열을 bytes로 인코드 해준다
         // 만약 getBytes()의 인자로 캐릭터셋을 넘기지 않으면 사용자 플랫폼의 기본 charset으로 인코딩된다.
         int len = b.length;
         if(len > keyBytes.length)// 키값이 16보다 크다면 key값을 16으로로 만들어줌 (키값의 길이는 16이어야함)
@@ -51,7 +51,7 @@ public class AES256Util {
         String enStr = new String(Base64.encodeBase64(encrypted));
         // bytes로 된걸  base64로 인코딩 해서 String 객체 생성
 
-        return enStr;	// 암호화된 값 리턴
+        return enStr;   // 암호화된 값 리턴
     }
 
     //복호화
@@ -63,6 +63,6 @@ public class AES256Util {
 
         byte[] byteStr = Base64.decodeBase64(str.getBytes());
         // 데이터를 암호화작업을 마친다 doFinal은 암호화 하거나 복호화(해독)한다 여기선 복호화
-        return new String(c.doFinal(byteStr),"UTF-8");	// 복호화된 값 리턴
+        return new String(c.doFinal(byteStr),"UTF-8");   // 복호화된 값 리턴
     }
 }

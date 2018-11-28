@@ -1,4 +1,4 @@
-package com.example.user.dooropenservice.app.Server;
+package com.example.user.dooropenservice.app.Model;
 
 import java.io.Serializable;
 

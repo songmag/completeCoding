@@ -14,7 +14,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.example.user.dooropenservice.app.Model.CompanyVO;
 import com.example.user.dooropenservice.app.ShakeAlgorithm.ShakeService;
+
+import java.util.ArrayList;
 
 /*
  * DoorOpenService
@@ -40,6 +43,10 @@ public class DoorOpenService extends Service {
     boolean isNetworkEnabled = false;
     boolean isGPSEnabled = false;
     boolean isGetLocation = false;
+
+    private ArrayList<CompanyVO> companyVOArrayList;
+
+    Intent intent;
 
     Location mLocation;
 
@@ -75,7 +82,7 @@ public class DoorOpenService extends Service {
                             shakeService.registerListener();
                         }
                     }
-                } else {//범위 밖으로 벗어난 경우
+                } else {   //범위 밖으로 벗어난 경우
                     if (shakeService != null) {
                         if (shakeService.isListenerSet()) {
                             shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
@@ -146,7 +153,6 @@ public class DoorOpenService extends Service {
     }
 
     public void getLocationManager(){
-
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
@@ -190,6 +196,12 @@ public class DoorOpenService extends Service {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
+        companyVOArrayList = new ArrayList<>();
+
+        companyVOArrayList = (ArrayList<CompanyVO>) intent.getSerializableExtra("ArrayList");
+
+        Log.e(TAG,"company : "+companyVOArrayList.get(0).getCompany() + "/lat : " + companyVOArrayList.get(0).getLatitude() + "/lon : "+ companyVOArrayList.get(0).getLongitude() + "/scope : " + companyVOArrayList.get(0).getScope());
+
         return START_STICKY;
     }
 
@@ -218,5 +230,4 @@ public class DoorOpenService extends Service {
 
         return distance;
     }
-
 }

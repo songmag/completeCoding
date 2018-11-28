@@ -1,7 +1,7 @@
 package com.example.user.dooropenservice.app.Server.ServerConnection;
 
+import com.example.user.dooropenservice.app.Model.UserVO;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
-import com.example.user.dooropenservice.app.Server.UserVO;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
