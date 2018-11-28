@@ -1,29 +1,30 @@
-package DataBases;
+package ClientJob;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import com.google.gson.JsonObject;
 
-public class Login extends DBConnect implements DBConnectionInterface {
+import DataBases.DBConnect;
+import DataBases.DBConnectionInterface;
+
+public class Logout extends DBConnect implements DBConnectionInterface{
+
 	@Override
 	public Object excute(JsonObject data) throws SQLException {
 		if(!connection())
-			return LOGIN_FAIL;		
+			return LOGIN_FAIL;
 		int return_value;
 		PreparedStatement stat;
-		stat = conn.prepareStatement(SIGNINSQL);
+		stat = conn.prepareStatement(LOGOUTSQL);
 		stat.setString(1, data.get("id").toString().replace("\"",""));
-		stat.setString(2, data.get("password").toString().replace("\"",""));
-
 		if(stat.executeUpdate()==0)
 		{
 			return_value = LOGIN_FAIL;
 		}
-		else
-			return_value = SUCCESS;
+		return_value = LOGIN_OK;
 		stat.close();
 		closeConnection();
 		return return_value;
-	}	
+	}
 }

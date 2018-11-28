@@ -21,17 +21,12 @@ public class UserServer {
 			local = InetAddress.getLocalHost();
 			String ip = local.getHostAddress();
 			System.out.println("IP : " + ip);
-
 			serverSocket = new ServerSocket(ServerPort);
 			System.out.println("Server Open");
-			
 			while (true) {
 				Socket client = serverSocket.accept();
-				
-				System.out.println("Client ����");
 				ClientThread clientThread = new ClientThread(client);
-				clientThread.start();
-				
+				clientThread.start();	
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

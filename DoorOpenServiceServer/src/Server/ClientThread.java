@@ -11,14 +11,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import DataBases.DBConnectionInterface;
-import DataBases.DataBaseFactory;
+import DataBases.DBFactory;
 
 public class ClientThread extends Thread {
 	BufferedReader reader; 
 	PrintWriter writer; 
 	Socket client;
 	
-	DataBaseFactory db; 
+	DBFactory db; 
 	public ClientThread(Socket client) {
 		this.client = client;
 	}
@@ -33,7 +33,7 @@ public class ClientThread extends Thread {
 	@Override
 	public void run() {
 		DBConnectionInterface i_db;
-		db = new DataBaseFactory();
+		db = new DBFactory();
 		try {
 			reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			JsonParser parser = new JsonParser();
@@ -42,7 +42,6 @@ public class ClientThread extends Thread {
 			i_db = db.factory(data);
 			writer = new PrintWriter(
 					new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
-			System.out.println("Flag change : " + i_db.excute(data));
 			writer.println(i_db.excute(data));
 			
 		} catch (Exception e) {

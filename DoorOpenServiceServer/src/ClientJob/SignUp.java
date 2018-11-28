@@ -1,9 +1,12 @@
-package DataBases;
+package ClientJob;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import com.google.gson.JsonObject;
+
+import DataBases.DBConnect;
+import DataBases.DBConnectionInterface;
 
 public class SignUp  extends DBConnect implements DBConnectionInterface{
 
@@ -38,7 +41,7 @@ public class SignUp  extends DBConnect implements DBConnectionInterface{
 				}
 				stat.close();
 				if(return_value == 0)
-					return_value = LOGIN_OK;
+					return_value = SUCCESS;
 				System.out.println("signin end");
 				closeConnection();
 				return return_value;
