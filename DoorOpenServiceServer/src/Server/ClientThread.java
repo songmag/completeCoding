@@ -35,13 +35,13 @@ public class ClientThread extends Thread {
 		DBConnectionInterface i_db;
 		db = new DBFactory();
 		try {
-			reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(client.getInputStream(),"UTF-8"));
 			JsonParser parser = new JsonParser();
 			JsonObject data = (JsonObject) parser.parse(reader.readLine());
 			System.out.println("ID,PW >> : " + data.get("id") + data.get("password"));
 			i_db = db.factory(data);
 			writer = new PrintWriter(
-					new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
+					new BufferedWriter(new OutputStreamWriter(client.getOutputStream(),"UTF-8")), true);
 			writer.println(i_db.excute(data));
 			
 		} catch (Exception e) {

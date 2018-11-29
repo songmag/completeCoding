@@ -22,6 +22,7 @@ public class SignUp  extends DBConnect implements DBConnectionInterface{
 				stat.setString(1, data.get("id").toString().replace("\"",""));
 				stat.setString(2, data.get("password").toString().replace("\"",""));
 				stat.setString(3, data.get("name").toString().replace("\"",""));
+				System.out.println(data.get("name").toString().replace("\"",""));
 				try{
 						stat.executeUpdate();
 					}catch(SQLException e)
@@ -46,5 +47,9 @@ public class SignUp  extends DBConnect implements DBConnectionInterface{
 				closeConnection();
 				return return_value;
 	}
-
+	private boolean signup(JsonObject data)
+	{
+		
+		return true;
+	}//transaction ±¸Çö
 }
