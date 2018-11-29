@@ -56,36 +56,36 @@ public class DoorOpenService extends Service {
     private class LocationListener implements android.location.LocationListener {
 
         public LocationListener(String provider) {
-            Log.e(TAG, "LocationListener " + provider);
             mLocation = new Location(provider);
         }
 
         @Override
         public void onLocationChanged(Location location) {
             if (location != null) {
-                Log.e(TAG, "onLocationChanged : " + location);
-
                 mLocation.set(location);
-                Log.i(TAG, "GPS : " + location.getLatitude() + "/" + location.getLongitude() + "");
+                callShakeAlgorithm();
 
-                distance = new double[companyVOArrayList.size()];
+            }
+        }
 
-                for (int i = 0; i < companyVOArrayList.size(); i++) {
-                    distance[i] = getDistance(companyVOArrayList.get(i).getLatitude(), companyVOArrayList.get(i).getLongitude(), mLocation.getLatitude(), mLocation.getLongitude());
+        private void callShakeAlgorithm() {
+            distance = new double[companyVOArrayList.size()];
 
-                    Log.e(TAG, "Distance : " + distance[i] + "");
+            for (int i = 0; i < companyVOArrayList.size(); i++) {
+                distance[i] = getDistance(companyVOArrayList.get(i).getLatitude(), companyVOArrayList.get(i).getLongitude(), mLocation.getLatitude(), mLocation.getLongitude());
 
-                    if (distance[i] <= companyVOArrayList.get(i).getScope()) {
+                Log.e(TAG, "Distance : " + distance[i] + "");
 
-                        shakeService = ShakeService.getInstance(getApplicationContext());
-                        shakeService.registerListener();
+                if (distance[i] <= companyVOArrayList.get(i).getScope()) {
+
+                    shakeService = ShakeService.getInstance(getApplicationContext());
+                    shakeService.registerListener();
 
 
-                    } else {   //범위 밖으로 벗어난 경우
-                        if (shakeService != null) {
-                            if (shakeService.isListenerSet()) {
-                                shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
-                            }
+                } else {   //범위 밖으로 벗어난 경우
+                    if (shakeService != null) {
+                        if (shakeService.isListenerSet()) {
+                            shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
                         }
                     }
                 }
@@ -94,17 +94,17 @@ public class DoorOpenService extends Service {
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.e(TAG, "onStatusChanged : " + provider);
+
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            Log.e(TAG, "onProviderEnabled : " + provider);
+
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            Log.e(TAG, "onProviderDisabled : " + provider);
+
         }
     }
 
@@ -114,11 +114,13 @@ public class DoorOpenService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "onDestroy");
-
         //ShakeService 의 메모리 해제
+        removeListeners();
 
-        if(shakeService!=null) {
+    }
+
+    private void removeListeners() {
+        if (shakeService != null) {
             shakeService.removeListener();
         }
 
@@ -155,7 +157,6 @@ public class DoorOpenService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         companyVOArrayList = (ArrayList<CompanyVO>) intent.getSerializableExtra("ArrayList");
-        Log.e(TAG, "company : " + companyVOArrayList.get(0).getCompany() + "/lat : " + companyVOArrayList.get(0).getLatitude() + "/lon : " + companyVOArrayList.get(0).getLongitude() + "/scope : " + companyVOArrayList.get(0).getScope());
 
         return START_STICKY;
     }
