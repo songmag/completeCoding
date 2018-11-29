@@ -83,8 +83,9 @@ public class LoginActivity extends Activity {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             user = new UserVO(id,null,null,null);
             intent.putExtra("userVO",user);
-            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            finish();
 
         }
     }
@@ -98,7 +99,7 @@ public class LoginActivity extends Activity {
             public void StartService() {
                 Intent MainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
                 MainActivityIntent.putExtra("userVO",user);//인텐트에 로그인에 대한 정보를 넣어줌
-
+                MainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                 //로그인이 되어 실행이 되면 현재 로그인정보를 저장한다.
                 SharedPreferences preferences = getSharedPreferences("LoginInfo", 0);
@@ -107,6 +108,7 @@ public class LoginActivity extends Activity {
                 editor.apply();
 
                 startActivity(MainActivityIntent);
+                finish();
             }
 
             @Override
@@ -168,6 +170,7 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
             }
         });

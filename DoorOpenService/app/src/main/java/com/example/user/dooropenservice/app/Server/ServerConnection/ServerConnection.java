@@ -19,6 +19,7 @@ import javax.security.auth.callback.Callback;
  * 서버와 연결을 위한 스레드 클래스
  * 자식으로 ServerLogOut, ServerLogin을 가진다.
  * function : 서버와의 소켓연결, UserVO 를 JsonObject 로 묶는다.
+ * 클래스를 확인하여 Json data에 서버에게 알려줄 key값을 설정하여 넣어준다.
  * @Author : 조재영
  */
 abstract class ServerConnection extends Thread {

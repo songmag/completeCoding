@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     BluetoothAdapter bluetoothAdapter;
 
 
-
     Button logOutBtn;//로그아웃 버튼
+    Button managerBtn;
 
     ServerLogOut serverLogOut;//서버에서 flag 를 바꾸기 위한 로그아웃 스레드
     UserVO user;
@@ -56,9 +56,9 @@ public class MainActivity extends AppCompatActivity {
         //로그인정보를 가져오는 작업
         intent = getIntent();
         user = (UserVO) intent.getSerializableExtra("userVO");
-        user.setCompany("1");//서버에서 [ 로그아웃 vs company 정보 ] 확인하기위해 더미데이터를 넣어주는 작업
 
-        setResult(RESULT_OK, intent);
+        setManageButton();
+
         //블루투스 이용 가능상태 확인
         CheckingBluetoothState();
 
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        return;
+        finish();
     }
 
     private void CheckingBluetoothState() {
@@ -113,20 +113,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         };
-        //로그아웃버튼
-        logOutBtn = findViewById(R.id.logout);
-        logOutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                serverLogOut = new ServerLogOut(user, LogoutCallback);
-                serverLogOut.setName("serverLogout");
-                serverLogOut.start();
-                //로그아웃을 하면 정보를 지운다
-                deletePreferencesData();
-                stopService(new Intent(getApplicationContext(), DoorOpenService.class));
-                finish();
-            }
-        });
     }
 
     private void deletePreferencesData() {
@@ -147,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
             @Override
             public void startService(ArrayList<CompanyVO> companyVOArrayList) {
                 //DoorOpenService 실행 ->getServerCompanyData 에서 정보를 받아 실행시키는 형태로 제작
@@ -157,5 +144,48 @@ public class MainActivity extends AppCompatActivity {
         };
         serverCompanyCheck = new ServerCompanyCheck(user, companyCheckCallback);
         serverCompanyCheck.start();
+    }
+
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.logout:   //ID 확인하는 과정
+                logOutBtn = findViewById(R.id.logout);
+                logOutBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        serverLogOut = new ServerLogOut(user, LogoutCallback);
+                        serverLogOut.setName("serverLogout");
+                        serverLogOut.start();
+                        //로그아웃을 하면 정보를 지운다
+                        deletePreferencesData();
+                        stopService(new Intent(getApplicationContext(), DoorOpenService.class));
+                        finish();
+                        Intent restartLoginAct = new Intent(getApplicationContext(), LoginActivity.class);
+                        restartLoginAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(restartLoginAct);
+                    }
+                });
+                break;
+        }
+    }
+
+    public void setManageButton(){
+        String userId = user.getId();
+
+        managerBtn = (Button) findViewById(R.id.manager);
+
+        if(userId.equals("admin")){
+            managerBtn.setVisibility(View.VISIBLE);
+        }
+        else{
+            managerBtn.setVisibility(View.INVISIBLE);
+        }
+
+        managerBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Toast.makeText(getApplicationContext(),"관리자니?",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -28,20 +28,19 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView company, pw_signal;
 
     private final int REQUEST_CODE = 100;
-    private final int SERVER_ID_OK = 1000;
 
     private boolean CONFIRM_ID_OK = false;
     private boolean CONFIRM_PW_OK = false;
     private boolean CONFIRM_NAME_OK = false;
     private boolean CONFIRM_COMPANY_OK = false;
-    private boolean CHECK_ASYNCTASK = true;
+    private boolean CHECK_ASYNC_TASK = true;
 
     Intent intent;
     private ISignUpCallback signUpCallback;
     private IDuplicationCallback duplicationCallback;
     private long backKeyPressedTime = 0;
 
-    private String companyName="";//서버로 보낼 company이름
+    private String companyName = "";//서버로 보낼 company이름
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
         SetContents();
 
         StartASyncTask();
+
         CallbackSetting();
     }
 
@@ -86,30 +86,15 @@ public class SignUpActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:   //ID 확인하는 과정
-                user_id = id.getText().toString();
-
-                if (user_id.length() < 4 || user_id.length() > 16)
-                    Toast.makeText(getApplicationContext(), "아이디를 정확히 입력해주세요.", Toast.LENGTH_SHORT).show();
-                else {
-                    //서버에서 ID 중복확인 받는 코드 , RSULT_CODE 받아야됨
-                    ServerDuplicateID serverDuplicateID = new ServerDuplicateID(new UserVO(user_id,null,null,null),duplicationCallback);
-                    serverDuplicateID.setName("serverDuplicateThread");
-                    serverDuplicateID.start();
-                }
+                getUserId();
                 break;
 
             case R.id.selectCompany:
-                intent = new Intent(this, SelectCompanyActivity.class);
-                startActivityForResult(intent, REQUEST_CODE);
+                startSelectPopup();
                 break;
 
             case R.id.finishBtn:
-                if (checkSignUp()) {
-                    Toast.makeText(getApplicationContext(), "회원가입이 완료되었습니다.", Toast.LENGTH_LONG).show();
-                    finish();
-                } else {
-                    Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요", Toast.LENGTH_LONG).show();
-                }
+                finishSignUp();
                 break;
 
         }
@@ -147,33 +132,32 @@ public class SignUpActivity extends AppCompatActivity {
         checkCompName();
 
         if (CONFIRM_NAME_OK && CONFIRM_ID_OK && CONFIRM_PW_OK && CONFIRM_COMPANY_OK) {
-            CHECK_ASYNCTASK = false;
-            ServerSignUp serverSignUp = new ServerSignUp(new UserVO(user_id,user_pw,companyName,name.getText().toString()),signUpCallback);
+            CHECK_ASYNC_TASK = false;
+            ServerSignUp serverSignUp = new ServerSignUp(new UserVO(user_id, user_pw, companyName, name.getText().toString()), signUpCallback);
             serverSignUp.setName("ServerSignUpThread");
             serverSignUp.start();
             return true;
-        }
-        else
+        } else
             return false;
 
 
     }
 
     @Override
-    public void onBackPressed(){
-        if(System.currentTimeMillis() > backKeyPressedTime + 2000){
+    public void onBackPressed() {
+        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
             backKeyPressedTime = System.currentTimeMillis();
-            Toast.makeText(getApplicationContext(),"회원가입을 취소하려면 \'뒤로\'버튼을 한번 더 눌러주세요.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "회원가입을 취소하려면 \'뒤로\'버튼을 한번 더 눌러주세요.", Toast.LENGTH_LONG).show();
             return;
         }
-        if(System.currentTimeMillis() <= backKeyPressedTime + 2000){
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
             finish();
         }
     }
 
     @Override
-    public void onDestroy(){
-        CHECK_ASYNCTASK = false;
+    public void onDestroy() {
+        CHECK_ASYNC_TASK = false;
         super.onDestroy();
     }
 
@@ -185,11 +169,11 @@ public class SignUpActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... progress) {
-            while(CHECK_ASYNCTASK){
-                try{
+            while (CHECK_ASYNC_TASK) {
+                try {
                     publishProgress();
                     Thread.sleep(1000);
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -198,29 +182,16 @@ public class SignUpActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(Void... progress) {
-            user_pw = pw.getText().toString();
-            user_pw2 = pw_2.getText().toString();
-
-            if (user_pw.length() < 6 || user_pw.length() > 16) {
-                pw_signal.setText("형식이 맞지 않습니다.");
-                pw_signal.setTextColor(Color.parseColor("#FF8888"));
-            } else if (user_pw.equals(user_pw2)) {
-                CONFIRM_PW_OK = true;
-                pw_signal.setText("사용가능");
-                pw_signal.setTextColor(Color.parseColor("#99FF99"));
-            } else {
-                pw_signal.setText("비밀번호가 일치하지 않습니다.");
-                pw_signal.setTextColor(Color.parseColor("#FF8888"));
-            }
+            getUserPassword();
         }
     }
 
-    private void StartASyncTask(){
+    private void StartASyncTask() {
         MyAsyncTask mTask = new MyAsyncTask();
         mTask.execute();
     }
 
-    private void CallbackSetting(){
+    private void CallbackSetting() {
         signUpCallback = new ISignUpCallback() {
             @Override
             public void ServerConnectionError() {
@@ -237,7 +208,7 @@ public class SignUpActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(),"유효한 아이디입니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "유효한 아이디입니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -253,12 +224,13 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 });
             }
+
             @Override
             public void Duplicate_ID() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(),"아이디가 중복됩니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "아이디가 중복됩니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -269,12 +241,56 @@ public class SignUpActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(),"인증 성공",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "인증 성공", Toast.LENGTH_SHORT).show();
                     }
                 });
 
                 CONFIRM_ID_OK = true;
             }
         };
+    }
+
+    public void getUserId() {
+        user_id = id.getText().toString();
+
+        if (user_id.length() < 4 || user_id.length() > 16)
+            Toast.makeText(getApplicationContext(), "아이디를 정확히 입력해주세요.", Toast.LENGTH_SHORT).show();
+        else {
+            //서버에서 ID 중복확인 받는 코드 , RSULT_CODE 받아야됨
+            ServerDuplicateID serverDuplicateID = new ServerDuplicateID(new UserVO(user_id, null, null, null), duplicationCallback);
+            serverDuplicateID.setName("serverDuplicateThread");
+            serverDuplicateID.start();
+        }
+    }
+
+    public void startSelectPopup() {
+        intent = new Intent(this, SelectCompanyActivity.class);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    public void finishSignUp() {
+        if (checkSignUp()) {
+            Toast.makeText(getApplicationContext(), "회원가입이 완료되었습니다.", Toast.LENGTH_LONG).show();
+            finish();
+        } else {
+            Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void getUserPassword() {
+        user_pw = pw.getText().toString();
+        user_pw2 = pw_2.getText().toString();
+
+        if (user_pw.length() < 6 || user_pw.length() > 16) {
+            pw_signal.setText("형식이 맞지 않습니다.");
+            pw_signal.setTextColor(Color.parseColor("#FF8888"));
+        } else if (user_pw.equals(user_pw2)) {
+            CONFIRM_PW_OK = true;
+            pw_signal.setText("사용가능");
+            pw_signal.setTextColor(Color.parseColor("#99FF99"));
+        } else {
+            pw_signal.setText("비밀번호가 일치하지 않습니다.");
+            pw_signal.setTextColor(Color.parseColor("#FF8888"));
+        }
     }
 }
