@@ -94,6 +94,6 @@ public class ServerCompanyCheck extends ServerConnection {
     @Override
     protected void sendData() {
         PrintWriter out = new PrintWriter(writer, true);
-        out.println(getJuser());
+        out.println(getJsonObj());
     }
 }

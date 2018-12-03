@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
+        return;
     }
 
     private void CheckingBluetoothState() {
@@ -160,12 +160,8 @@ public class MainActivity extends AppCompatActivity {
                         deletePreferencesData();
                         stopService(new Intent(getApplicationContext(), DoorOpenService.class));
                         finish();
-                        Intent restartLoginAct = new Intent(getApplicationContext(), LoginActivity.class);
-                        restartLoginAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(restartLoginAct);
                     }
                 });
-                break;
         }
     }
 
@@ -184,7 +180,8 @@ public class MainActivity extends AppCompatActivity {
         managerBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"관리자니?",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
+                startActivity(intent);
             }
         });
     }

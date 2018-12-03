@@ -56,10 +56,6 @@ public class LoginActivity extends Activity {
         //회원가입에 관련된 메소드들
         setSignUpButton();//회원가입 버튼 셋팅
 
-
-
-
-
     }
 
     @Override
@@ -73,6 +69,7 @@ public class LoginActivity extends Activity {
         ID = findViewById(R.id.id);
         PassWord = findViewById(R.id.password);
         Login = findViewById(R.id.button);
+
     }
 
     private void checkLoginState() {
@@ -83,9 +80,8 @@ public class LoginActivity extends Activity {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             user = new UserVO(id,null,null,null);
             intent.putExtra("userVO",user);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
-            finish();
 
         }
     }
@@ -98,8 +94,9 @@ public class LoginActivity extends Activity {
             @Override
             public void StartService() {
                 Intent MainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                user = new UserVO(ID.getText().toString(),PassWord.getText().toString(),null,null);
                 MainActivityIntent.putExtra("userVO",user);//인텐트에 로그인에 대한 정보를 넣어줌
-                MainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
 
                 //로그인이 되어 실행이 되면 현재 로그인정보를 저장한다.
                 SharedPreferences preferences = getSharedPreferences("LoginInfo", 0);
@@ -108,7 +105,6 @@ public class LoginActivity extends Activity {
                 editor.apply();
 
                 startActivity(MainActivityIntent);
-                finish();
             }
 
             @Override
@@ -170,7 +166,6 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
             }
         });
