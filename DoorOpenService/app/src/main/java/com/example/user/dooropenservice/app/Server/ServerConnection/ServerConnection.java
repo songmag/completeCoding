@@ -1,5 +1,6 @@
 package com.example.user.dooropenservice.app.Server.ServerConnection;
 
+import com.example.user.dooropenservice.app.Model.CompanyVO;
 import com.example.user.dooropenservice.app.Model.UserVO;
 import com.example.user.dooropenservice.app.Encryption.SHA256;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
@@ -39,20 +40,44 @@ abstract class ServerConnection extends Thread {
 
     //사용자 정보를 담을 UserVo 객체
     UserVO user;
+    //회사 정보를 담을 CompanyVO 객체
+    CompanyVO companyVO;
 
     //JsonParising을 위한 Json객체
-    private JSONObject Juser;
+    private JSONObject JsonObj;
 
     private final int LOGIN = 1;
     private final int LOGOUT = 2;
     private final int COMPANY_CHECK = 3;
     private final int DUPLICATE_ID = 4;
     private final int SIGN_UP = 5;
+    private final int REGIST_NEW_LOCATION = 6;
+    private final int GET_COMPANY_LIST = 7;
 
+    //CompanyVO를 위한 생성자
+    public ServerConnection(CompanyVO companyVO){
+        this.companyVO =companyVO;
+        try {
+            int key=0;
+            if (this instanceof ServerRegistNewLocation) {
+                key = REGIST_NEW_LOCATION;
+            }
+            JsonObj = new JSONObject();
+            JsonObj.put("key", key);
+            JsonObj.put("company",companyVO.getCompany());
+            JsonObj.put("latitude",companyVO.getLatitude());
+            JsonObj.put("longitude",companyVO.getLongitude());
+            JsonObj.put("scope",companyVO.getScope());
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+
+    }
+    //UserVo를 위한 생성자
     public ServerConnection(UserVO user, Callback callback) {
         this.user = user;
         this.callback = callback;
-        Juser = new JSONObject();
+        JsonObj = new JSONObject();
         //JSON 데이터 삽입
         try {
             String encryptionPassword = getEncryption(user);//암호화
@@ -69,12 +94,14 @@ abstract class ServerConnection extends Thread {
                 key = DUPLICATE_ID;
             } else if (this instanceof ServerSignUp) {
                 key = SIGN_UP;
+            }else if(this instanceof ServerGetCompanyList){
+                key = GET_COMPANY_LIST;
             }
-            Juser.put("key", key);
-            Juser.put("id", user.getId());
-            Juser.put("password", encryptionPassword);
-            Juser.put("company", user.getCompany());
-            Juser.put("name", user.getName());
+            JsonObj.put("key", key);
+            JsonObj.put("id", user.getId());
+            JsonObj.put("password", encryptionPassword);
+            JsonObj.put("company", user.getCompany());
+            JsonObj.put("name", user.getName());
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -130,7 +157,7 @@ abstract class ServerConnection extends Thread {
     }
 
     //하위클래스에서 사용자정보를 가진 JSonObject 를 가져오기 위함
-    public JSONObject getJuser() {
-        return Juser;
+    public JSONObject getJsonObj() {
+        return JsonObj;
     }
 }

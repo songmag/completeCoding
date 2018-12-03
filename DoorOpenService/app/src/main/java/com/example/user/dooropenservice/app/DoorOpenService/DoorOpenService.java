@@ -44,7 +44,6 @@ public class DoorOpenService extends Service {
 
     private ArrayList<CompanyVO> companyVOArrayList;
 
-
     Location mLocation;
 
     @Nullable
@@ -56,55 +55,36 @@ public class DoorOpenService extends Service {
     private class LocationListener implements android.location.LocationListener {
 
         public LocationListener(String provider) {
+            Log.e(TAG, "LocationListener " + provider);
             mLocation = new Location(provider);
+
         }
 
         @Override
         public void onLocationChanged(Location location) {
             if (location != null) {
+                Log.e(TAG, "onLocationChanged : " + location);
+
                 mLocation.set(location);
+                Log.i(TAG, "GPS : " + location.getLatitude() + "/" + location.getLongitude() + "");
+
                 callShakeAlgorithm();
-
-            }
-        }
-
-        private void callShakeAlgorithm() {
-            distance = new double[companyVOArrayList.size()];
-
-            for (int i = 0; i < companyVOArrayList.size(); i++) {
-                distance[i] = getDistance(companyVOArrayList.get(i).getLatitude(), companyVOArrayList.get(i).getLongitude(), mLocation.getLatitude(), mLocation.getLongitude());
-
-                Log.e(TAG, "Distance : " + distance[i] + "");
-
-                if (distance[i] <= companyVOArrayList.get(i).getScope()) {
-
-                    shakeService = ShakeService.getInstance(getApplicationContext());
-                    shakeService.registerListener();
-
-
-                } else {   //범위 밖으로 벗어난 경우
-                    if (shakeService != null) {
-                        if (shakeService.isListenerSet()) {
-                            shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
-                        }
-                    }
-                }
             }
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-
+            Log.e(TAG, "onStatusChanged : " + provider);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-
+            Log.e(TAG, "onProviderEnabled : " + provider);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-
+            Log.e(TAG, "onProviderDisabled : " + provider);
         }
     }
 
@@ -114,26 +94,10 @@ public class DoorOpenService extends Service {
 
     @Override
     public void onDestroy() {
-        //ShakeService 의 메모리 해제
+        Log.e(TAG, "onDestroy");
+        super.onDestroy();
+
         removeListeners();
-
-    }
-
-    private void removeListeners() {
-        if (shakeService != null) {
-            shakeService.removeListener();
-        }
-
-
-        if (locationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
-                try {
-                    locationManager.removeUpdates(mLocationListeners[i]);
-                } catch (Exception e) {
-                    Log.i(TAG, "fail to remove location listeners, ignore", e);
-                }
-            }
-        }
     }
 
     private void initializeLocationManager() {
@@ -146,19 +110,10 @@ public class DoorOpenService extends Service {
     @Override
     public void onCreate() {
         initializeLocationManager();
+
         setNotification(); //백그라운드 서비스를 유지하기위한 설정 (이거는 유지 onCreate에 있어야 함)
 
         getLocationManager();
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-
-        companyVOArrayList = (ArrayList<CompanyVO>) intent.getSerializableExtra("ArrayList");
-
-        return START_STICKY;
     }
 
     public void getLocationManager() {
@@ -167,7 +122,7 @@ public class DoorOpenService extends Service {
 
 
         if (!isGPSEnabled && !isNetworkEnabled) {
-            //둘다 안될 때 구현(필요없을 듯)
+            //둘다 안될 때 구현
         } else {
             isGetLocation = true;
 
@@ -200,6 +155,16 @@ public class DoorOpenService extends Service {
     }
 
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(TAG, "onStartCommand");
+        super.onStartCommand(intent, flags, startId);
+
+        companyVOArrayList = (ArrayList<CompanyVO>) intent.getSerializableExtra("ArrayList");
+
+        return START_STICKY;
+    }
+
     //Notification을 추가함으로써 ForeGround에 Service가 실행되고있음을 보임으로써 Service 종료 방지
     public void setNotification() {
 //        Intent notificationIntent = new Intent(this,MainActivity.class);
@@ -224,5 +189,47 @@ public class DoorOpenService extends Service {
         distance = locationA.distanceTo(locationB);
 
         return distance;
+    }
+
+    public void callShakeAlgorithm() {
+        distance = new double[companyVOArrayList.size()];
+
+        for (int i = 0; i < companyVOArrayList.size(); i++) {
+            distance[i] = getDistance(companyVOArrayList.get(i).getLatitude(), companyVOArrayList.get(i).getLongitude(), mLocation.getLatitude(), mLocation.getLongitude());
+
+            Log.e(TAG, "Distance : " + distance[i] + "");
+
+            if (distance[i] <= companyVOArrayList.get(i).getScope()) {
+                shakeService = ShakeService.getInstance(getApplicationContext());
+                shakeService.registerListener();
+
+            } else {   //범위 밖으로 벗어난 경우
+                if (shakeService != null) {
+                    if (shakeService.isListenerSet()) {
+                        shakeService.removeListener(); //거리 밖으로 오면 이코드 추가 3줄 다.
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeListeners() {
+        //ShakeService 의 메모리 해제
+        if (shakeService != null) {
+            if (shakeService.isListenerSet()) {
+                shakeService.removeListener();
+                shakeService = null;
+            }
+        }
+
+        if (locationManager != null) {
+            for (int i = 0; i < mLocationListeners.length; i++) {
+                try {
+                    locationManager.removeUpdates(mLocationListeners[i]);
+                } catch (Exception e) {
+                    Log.i(TAG, "fail to remove location listeners, ignore", e);
+                }
+            }
+        }
     }
 }

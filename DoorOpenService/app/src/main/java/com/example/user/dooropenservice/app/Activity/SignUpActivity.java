@@ -33,7 +33,7 @@ public class SignUpActivity extends AppCompatActivity {
     private boolean CONFIRM_PW_OK = false;
     private boolean CONFIRM_NAME_OK = false;
     private boolean CONFIRM_COMPANY_OK = false;
-    private boolean CHECK_ASYNC_TASK = true;
+    private boolean CHECK_ASYNCTASK = true;
 
     Intent intent;
     private ISignUpCallback signUpCallback;
@@ -68,7 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
     };
 
     private void SetContents() {
-        id = (EditText) findViewById(R.id.editText_id);
+        id = (EditText) findViewById(R.id.textView_id);
         id.setFilters(new InputFilter[]{filter});
 
         pw = (EditText) findViewById(R.id.editText_pw);
@@ -132,7 +132,7 @@ public class SignUpActivity extends AppCompatActivity {
         checkCompName();
 
         if (CONFIRM_NAME_OK && CONFIRM_ID_OK && CONFIRM_PW_OK && CONFIRM_COMPANY_OK) {
-            CHECK_ASYNC_TASK = false;
+            CHECK_ASYNCTASK = false;
             ServerSignUp serverSignUp = new ServerSignUp(new UserVO(user_id, user_pw, companyName, name.getText().toString()), signUpCallback);
             serverSignUp.setName("ServerSignUpThread");
             serverSignUp.start();
@@ -157,7 +157,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        CHECK_ASYNC_TASK = false;
+        CHECK_ASYNCTASK = false;
         super.onDestroy();
     }
 
@@ -169,7 +169,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... progress) {
-            while (CHECK_ASYNC_TASK) {
+            while (CHECK_ASYNCTASK) {
                 try {
                     publishProgress();
                     Thread.sleep(1000);

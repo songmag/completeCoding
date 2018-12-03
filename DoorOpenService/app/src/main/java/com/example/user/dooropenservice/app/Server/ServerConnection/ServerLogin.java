@@ -87,7 +87,7 @@ public class ServerLogin extends ServerConnection {
     @Override
     protected void sendData() {
         PrintWriter out = new PrintWriter(writer, true);
-        out.println(getJuser());
+        out.println(getJsonObj());
     }
     @Override
     protected void settingSocket(){
