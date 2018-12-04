@@ -4,45 +4,38 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import DataBases.DBConnect;
 import DataBases.DBConnectionInterface;
 
-public class CompanySend extends DBConnect implements DBConnectionInterface{
-	
-	public CompanySend()
-	{
-		super();
-	}
-	
+public class CompanyAll extends DBConnect implements DBConnectionInterface{
+
 	@Override
 	public Object excute(JsonObject data) throws SQLException {
 		JsonArray return_value;
-		return_value = makeList(data.get("id").toString().replace("\"",""));
-		if(return_value == null)
+		return_value = makeList();
+		if(return_value== null)
 			return LOGIN_FAIL;
 		return return_value;
 	}
-	private JsonArray makeList(String id) throws SQLException
+	private JsonArray makeList() throws SQLException
 	{
 		if(!connection())
 		{
 			return null;
 		}
-		JsonArray return_value;
+		JsonArray return_value = null;
 		PreparedStatement stat;
-		stat = conn.prepareStatement(COMPANYSQL);
-		stat.setString(1, id);
+		stat = conn.prepareStatement(COMPANYRETURN);
 		ResultSet res;
 		res = stat.executeQuery();
 		return_value = new JsonArray();
 		while(res.next())
 		{
 			CompanyVO object;
-			object = new CompanyVO(res.getString("company"),res.getFloat("latitude"),res.getFloat("longitude"),res.getFloat("scope"));
+			object = new CompanyVO(res.getString("company"));
 			return_value.add(object.company);
 		}
 		if(return_value.size() == 0)
@@ -51,7 +44,8 @@ public class CompanySend extends DBConnect implements DBConnectionInterface{
 		}
 		res.close();
 		stat.close();
-		closeConnection();
+		closeConnection();		
 		return return_value;
 	}
+
 }

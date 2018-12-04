@@ -3,6 +3,8 @@ package DataBases;
 
 import com.google.gson.JsonObject;
 
+import ClientJob.Admin;
+import ClientJob.CompanyAll;
 import ClientJob.CompanySend;
 import ClientJob.DuplicateID;
 import ClientJob.Login;
@@ -28,6 +30,10 @@ public class DBFactory {
 			return new DuplicateID();
 		case 5:
 			return new SignUp();
+		case 6:
+			return new Admin();
+		case 7:
+			return new CompanyAll();
 		}
 		return null;
 	}

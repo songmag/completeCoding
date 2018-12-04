@@ -10,6 +10,11 @@ import DataBases.DBConnect;
 import DataBases.DBConnectionInterface;
 
 public class DuplicateID extends DBConnect implements DBConnectionInterface {
+	public DuplicateID()
+	{
+		super();
+	}
+	
 	@Override
 	public Object excute(JsonObject data) throws SQLException {
 		int return_value = 0;

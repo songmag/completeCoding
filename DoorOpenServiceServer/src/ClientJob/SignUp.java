@@ -10,6 +10,10 @@ import DataBases.DBConnectionInterface;
 
 public class SignUp  extends DBConnect implements DBConnectionInterface{
 
+	public SignUp()
+	{
+		super();
+	}
 	@Override
 	public Object excute(JsonObject data) throws SQLException {
 		// TODO Auto-generated method stub

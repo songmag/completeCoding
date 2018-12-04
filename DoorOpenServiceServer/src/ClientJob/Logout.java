@@ -10,6 +10,11 @@ import DataBases.DBConnectionInterface;
 
 public class Logout extends DBConnect implements DBConnectionInterface{
 
+	public Logout()
+	{
+		super();
+	}
+	
 	@Override
 	public Object excute(JsonObject data) throws SQLException {
 		if(!connection())

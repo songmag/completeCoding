@@ -10,6 +10,11 @@ import DataBases.DBConnect;
 import DataBases.DBConnectionInterface;
 
 public class Login extends DBConnect implements DBConnectionInterface {
+	public Login()
+	{
+		super();
+	}
+	
 	@Override
 	public Object excute(JsonObject data) throws SQLException {
 		if(!connection())
@@ -22,7 +27,6 @@ public class Login extends DBConnect implements DBConnectionInterface {
 		else
 			return_value = LOGIN_OK;
 		closeConnection();
-		System.out.println(return_value);
 		return return_value;
 	}
 	private int checkerror(JsonObject data) throws SQLException{

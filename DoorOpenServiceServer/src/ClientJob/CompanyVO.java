@@ -13,4 +13,9 @@ public class CompanyVO{
 		this.company.addProperty("longitude",Float.toString(longitude));
 		this.company.addProperty("scope", Float.toString(scope));
 	}
+
+	public CompanyVO(String company) {
+		this.company = new JsonObject();
+		this.company.addProperty("company",company);
+	}
 }
