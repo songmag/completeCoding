@@ -54,6 +54,7 @@ abstract class ServerConnection extends Thread {
     private final int REGIST_NEW_LOCATION = 6;
     private final int GET_COMPANY_LIST = 7;
 
+
     //CompanyVO를 위한 생성자
     public ServerConnection(CompanyVO companyVO){
         this.companyVO =companyVO;
@@ -71,6 +72,7 @@ abstract class ServerConnection extends Thread {
         }catch (JSONException e){
             e.printStackTrace();
         }
+
 
     }
     //UserVo를 위한 생성자

@@ -129,4 +129,6 @@ public class SelectCompanyActivity extends Activity {
     public void setList() {
 
     }
+
 }
+

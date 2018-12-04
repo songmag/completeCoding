@@ -1,11 +1,12 @@
-package com.exampleser.dooropenservice.app.Activity;
+
+package com.example.user.dooropenservice.app.Activity;
 
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
