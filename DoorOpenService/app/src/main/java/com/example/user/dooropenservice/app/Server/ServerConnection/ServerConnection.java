@@ -1,8 +1,8 @@
 package com.example.user.dooropenservice.app.Server.ServerConnection;
 
+import com.example.user.dooropenservice.app.Encryption.SHA256;
 import com.example.user.dooropenservice.app.Model.CompanyVO;
 import com.example.user.dooropenservice.app.Model.UserVO;
-import com.example.user.dooropenservice.app.Encryption.SHA256;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILogoutCallback;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.IServerCallback;
 

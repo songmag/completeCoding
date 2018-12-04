@@ -17,7 +17,6 @@ import com.example.user.dooropenservice.R;
 import com.example.user.dooropenservice.app.Model.UserVO;
 import com.example.user.dooropenservice.app.Server.ServerCallbackInterface.ILoginCallback;
 import com.example.user.dooropenservice.app.Server.ServerConnection.ServerLogin;
-import com.example.user.dooropenservice.app.ShakeAlgorithm.ShakeService;
 
 /*
  * LoginActivity
